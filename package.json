@@ -1,0 +1,22 @@
+{
+  "name": "cs361-text-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MylesScholz/CS361-Text-Editor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MylesScholz/CS361-Text-Editor/issues"
+  },
+  "homepage": "https://github.com/MylesScholz/CS361-Text-Editor#readme",
+  "dependencies": {
+    "node": "^20.1.0"
+  }
+}
