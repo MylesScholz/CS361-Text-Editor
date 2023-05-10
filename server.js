@@ -9,12 +9,12 @@ app.set('view engine', 'handlebars')
 
 app.set(express.json())
 
-app.use(express.static('src'))
+app.use(express.static('public'))
 
 /* Insert middleware here */
 
 app.get('*', (req, res, next) => {
-    console.log('Path that does not exist was requested.')
+    console.log(`'${req.path}' requested but does not exist.`)
     res.status(404).render('404Page')
 })
 
