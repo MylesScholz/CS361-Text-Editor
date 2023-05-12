@@ -13,6 +13,11 @@ app.use(express.static('public'))
 
 /* Insert middleware here */
 
+app.get('/', (req, res, next) =>{
+    console.log('Opening homepage')
+    res.status(200).render('homePage')
+})
+
 app.get('*', (req, res, next) => {
     console.log(`'${req.path}' requested but does not exist.`)
     res.status(404).render('404Page')
