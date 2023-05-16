@@ -1,6 +1,11 @@
+html{
+  height: 100%;
+}
+
 body {
     font-family: 'Lato', sans-serif;
     margin: 0;
+    height: 100%;
     background-color: #dadada;
   }
   
@@ -20,3 +25,22 @@ body {
   marquee{
     background-color: #03a9f4
   }
+
+#document-container{
+  background-color: lightgrey;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 10ch;
+
+  height: 100%;
+}
+
+#document{
+  background-color: aliceblue;
+
+  height: 100%;
+
+  padding: 3ch;
+}
