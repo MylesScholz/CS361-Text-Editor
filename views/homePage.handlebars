@@ -1,19 +1,7 @@
-<script src="saving.js"></script>
 
-<main class="home-page">
-  <div class="title-container">
-    <h1>MARMOTZ Text Editor <i class="fa fa-code"></i></h1>
-    <header behavior="alternate">
-      <button>Create New File</button>
-      <button>Open Saved File</button>
-      <button onclick="saveDocument()">Save File</button>
-    </header>
-    <div class="icon">
-      <i class="fa fa-group"></i>
-    </div>
-  </div>
+<main id="home-page-container">
+  <script src="home.js" type="text/javascript" defer></script>
+
+  <button id="create-document-button" onclick="location.href = '/document'">Create a New Document</button>
+  <button id="open-document-button">Open an Existing Document</button>
 </main>
-
-<section id="document-container">
-  <article id="document" contenteditable="true"></article>
-</section>
