@@ -1,32 +1,33 @@
-html{
+html {
   height: 100%;
 }
 
 body {
-    font-family: 'Lato', sans-serif;
-    margin: 0;
-    height: 100%;
-    background-color: #dadada;
-  }
-  
-  header {
-    background-color: #e78477;
-    color: #fff;
-  }
-  
-  a {
-    text-decoration: none;
-    color: #03a9f4;
-  }
-  
-  a:hover {
-    color: #0c719e;
-  }
-  marquee{
-    background-color: #03a9f4
-  }
+  font-family: 'Lato', sans-serif;
+  margin: 0;
+  height: 100%;
+  background-color: #dadada;
+}
 
-#document-container{
+header {
+  background-color: #e78477;
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+  color: #03a9f4;
+}
+
+a:hover {
+  color: #0c719e;
+}
+
+marquee {
+  background-color: #03a9f4
+}
+
+#document-container {
   background-color: lightgrey;
 
   display: flex;
@@ -37,7 +38,7 @@ body {
   height: 100%;
 }
 
-#document{
+#document {
   background-color: aliceblue;
 
   height: 100%;
