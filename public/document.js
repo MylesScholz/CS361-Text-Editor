@@ -1,1 +1,1 @@
-console.log('Home page JavaScript loaded.')
+console.log('Document page JavaScript loaded.')
