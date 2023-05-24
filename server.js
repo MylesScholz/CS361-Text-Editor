@@ -13,8 +13,13 @@ app.use(express.static('public'))
 
 /* Insert middleware here */
 
-app.get('/', (req, res, next) =>{
-    console.log('Opening homepage')
+app.get('/document', (req, res, next) => {
+    console.log('Opening document page.')
+    res.status(200).render('documentPage')
+})
+
+app.get('/', (req, res, next) => {
+    console.log('Opening home page.')
     res.status(200).render('homePage')
 })
 
