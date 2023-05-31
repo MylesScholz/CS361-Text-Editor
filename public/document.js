@@ -55,7 +55,7 @@ class Document {
   }
 }
 
-const workingDoc = new Document("document", "title");
+const workingDoc = new Document("document", "title", "text/html", ".html");
 
 function saveDocument() {
   workingDoc.download();
