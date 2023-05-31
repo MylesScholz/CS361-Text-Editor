@@ -1,5 +1,7 @@
 const express = require("express");
 const { engine } = require("express-handlebars");
+const multer = require("multer");
+const upload = multer();
 
 const port = process.env.port || 3000;
 const app = express();
@@ -15,7 +17,19 @@ app.use(express.static("public"));
 
 app.get("/document", (req, res, next) => {
   console.log("Opening document page.");
-  res.status(200).render("documentPage");
+  res.status(200).render("documentPage", "");
+});
+
+app.post("/document", upload.single("file"), (req, res, next) => {
+  console.log("Opening user document.");
+  res
+    .status(200)
+    .render("documentPage", { content: req.file.buffer.toString() });
+});
+
+app.get("/selectFile", (req, res, next) => {
+  console.log("Opening selectFile page.");
+  res.status(200).render("selectFilePage");
 });
 
 app.get("/", (req, res, next) => {
