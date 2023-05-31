@@ -1,0 +1,12 @@
+<main id="select-file-container">
+  {{! <script src="selectFile.js" type="text/javascript"></script> }}
+  <form
+    id="openFileForm"
+    action="/document"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <input type="file" id="fileInput" name="file" accept=".html,.txt" />
+    <button type="submit">Open file</button>
+  </form>
+</main>
