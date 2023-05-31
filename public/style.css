@@ -53,14 +53,14 @@ a:hover {
 #open-document-button {
   margin: 50px;
   border: 2px solid #82e5b4;
-  border-radius: 10px;
+  border-radius: 5px;
   width: 150px;
   height: 75px;
   padding: 10px;
   background-color: #16161e;
   font-size: 1em;
   font-family: 'Lato', sans-serif;
-  color: #82e5b4;
+  color: #ffffff;
   cursor: pointer;
 }
 
