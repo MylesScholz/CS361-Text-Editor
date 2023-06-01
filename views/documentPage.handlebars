@@ -1,7 +1,7 @@
 <main id="document-container">
   <script src="document.js" type="text/javascript" defer></script>
 
-  <button onClick="saveDocument()">Save File</button>
+  <button onClick="wrapSelection('em')">Save File</button>
   <input type="text" id="title" value="{{title}}" />
 
   <article id="document" contenteditable="true">{{{content}}}</article>

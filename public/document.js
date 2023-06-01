@@ -60,3 +60,23 @@ const workingDoc = new Document("document", "title", "text/html", ".html");
 function saveDocument() {
   workingDoc.download();
 }
+
+// Function that wraps the current selection with a given tag
+function wrapSelection(tag) {
+  const selection = document.getSelection()
+  // Note: getRangeAt(0) converts the selection to a Range. There can technically be multiple ranges in the selection,
+  // but very few browsers support that. In practice, the Range at index 0 is the only Range in the selection.
+  const selectionRange = selection.getRangeAt(0)
+
+  if (selectionRange.commonAncestorContainer == selectionRange.startContainer) {
+    console.log("Selection is within one node.")
+    selectionRange.surroundContents(document.createElement(tag))
+  } else {
+    console.log("Selection spans multiple nodes.")
+  }
+}
+
+// Recursive function that wraps all text under a given node with a given tag
+function wrapTextInNode(node, tag) {
+
+}
