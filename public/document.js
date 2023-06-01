@@ -61,7 +61,7 @@ function saveDocument() {
   workingDoc.download();
 }
 
-// Function that wraps the current selection with a given tag
+// Function that wraps the current selection with a given tag (string)
 function wrapSelection(tag) {
   const selection = document.getSelection()
   // Note: getRangeAt(0) converts the selection to a Range. There can technically be multiple ranges in the selection,
@@ -69,14 +69,44 @@ function wrapSelection(tag) {
   const selectionRange = selection.getRangeAt(0)
 
   if (selectionRange.commonAncestorContainer == selectionRange.startContainer) {
-    console.log("Selection is within one node.")
+    // The selection is within one element; simply surround the range with the tag
     selectionRange.surroundContents(document.createElement(tag))
   } else {
-    console.log("Selection spans multiple nodes.")
+    // The selection spans multiple elements
+    // Surround the text in the first node of the selection offset by the starting offset of the selection
+    const startNodeSubrange = document.createRange()
+    startNodeSubrange.selectNode(selectionRange.startContainer)
+    startNodeSubrange.setStart(selectionRange.startContainer, selectionRange.startOffset)
+    startNodeSubrange.surroundContents(document.createElement(tag))
+
+    // Surround the text in the last node of the selection offset by the offset of the end of the selection
+    const endNodeSubrange = document.createRange()
+    endNodeSubrange.selectNode(selectionRange.endContainer)
+    endNodeSubrange.setEnd(selectionRange.endContainer, selectionRange.endOffset)
+    endNodeSubrange.surroundContents(document.createElement(tag))
+
+    // For each of the remaining nodes, which are entirely contained in the range, recursively wrap the text with the tag
+    const commonAncestor = selectionRange.commonAncestorContainer
+    commonAncestor.childNodes.forEach((childNode) => {
+      if (childNode != commonAncestor.firstChild && childNode != commonAncestor.lastChild) {
+        wrapTextInNode(childNode, tag)
+      }
+    }, commonAncestor)
   }
 }
 
-// Recursive function that wraps all text under a given node with a given tag
+// Recursive function that wraps all text under a given node with a given tag (string)
 function wrapTextInNode(node, tag) {
+  // Stop the recursion at the level of text nodes, excluding empty text nodes
+  if (node.nodeType == Node.TEXT_NODE && node.textContent != "") {
+    // Wrap text in tags
+    let range = document.createRange()
+    range.selectNodeContents(node)
+    range.surroundContents(document.createElement(tag))
+  }
 
+  // Recursive call for each child of the current node
+  node.childNodes.forEach((childNode) => {
+    wrapTextInNode(childNode, tag)
+  })
 }
