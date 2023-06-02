@@ -5,4 +5,7 @@
   <input type="text" id="title" value="{{title}}" />
 
   <article id="document" contenteditable="true">{{{content}}}</article>
+  {{#if important}}
+    <img src="{{src}}" width="{{width}}" height="{{height}}" />
+  {{/if}}
 </main>

@@ -4,6 +4,9 @@ const multer = require("multer");
 const upload = multer();
 const path = require("path");
 
+const key =
+  "live_PllfhM4oZMM6X1C5s3T2igPjPMBTiKfBEElnckSxHwcxMoGU17lzJFcCmHHyUFWc";
+
 const port = process.env.port || 3000;
 const app = express();
 
@@ -29,11 +32,31 @@ app.post("/document", upload.single("file"), (req, res, next) => {
 
   const file = req.file;
   const title = path.parse(file.originalname).name;
+  const content = file.buffer.toString();
 
-  res.status(200).render("documentPage", {
-    title,
-    content: file.buffer.toString(),
-  });
+  const input = { title, content };
+
+  if (title == "give me a kitty") {
+    console.log("cat zone");
+
+    fetch("https://api.thecatapi.com/v1/images/search", {
+      headers: {
+        "x-api-key": key,
+      },
+    })
+      .then((value) => value.json())
+      .then(([data]) => {
+        res.status(200).render("documentPage", {
+          important: true,
+          src: data.url,
+          width: data.width,
+          height: data.height,
+          ...input,
+        });
+      });
+  } else {
+    res.status(200).render("documentPage", input);
+  }
 });
 
 app.get("/selectFile", (req, res, next) => {
