@@ -100,7 +100,7 @@ function wrapTextInNode(node, tag) {
   // Stop the recursion at the level of text nodes, excluding empty text nodes
   if (node.nodeType == Node.TEXT_NODE && node.textContent != "") {
     // Wrap text in tags
-    let range = document.createRange()
+    const range = document.createRange()
     range.selectNodeContents(node)
     range.surroundContents(document.createElement(tag))
     return
@@ -119,27 +119,38 @@ function percolateStyleTags() {
 }
 
 // Recursive helper function that percolates a given tag down from a given node
+// node is assumed to have a parent
 function percolateTagInNode(node, tag) {
-  if (node.nodeType == Node.TEXT_NODE) {
+  if (node.nodeType != Node.ELEMENT_NODE) {
     // Base case
     return
   }
+  const children = node.children
 
-  if (node.nodeType == Node.ELEMENT_NODE && node.tagName == tag) {
-    // Tag processing
-    node.childNodes.forEach((childNode) => {
-      if (childNode.hasChildNodes()) {
-        // Wrap childNode's children in tag
-      } else {
-        // Wrap text in tag
+  if (node.tagName.toLowerCase() == tag && children.length > 0) {
+    for (let i = 0; i < children.length; i++) {
+      let child = children.item(i)
+
+      if (child.hasChildNodes() && child.tagName.toLowerCase() != tag) {
+        const range = document.createRange()
+        range.selectNodeContents(child)
+        range.surroundContents(document.createElement(tag))
       }
-    })
-    // Extract tag's children
-    // Add tag's children as siblings
-    // Delete tag
+    }
+
+    for (let i = 0; i < children.length; i++) {
+      percolateTagInNode(children.item(0), tag)
+    }
+
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    const nodeContents = range.extractContents()
+
+    node.replaceWith(nodeContents)
+    return
   }
 
-  node.childNodes.forEach((childNode) => {
-    percolateTagInNode(childNode, tag)
-  })
+  for (let i = 0; i < children.length; i++) {
+    percolateTagInNode(children.item(0), tag)
+  }
 }
