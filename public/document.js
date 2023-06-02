@@ -103,10 +103,43 @@ function wrapTextInNode(node, tag) {
     let range = document.createRange()
     range.selectNodeContents(node)
     range.surroundContents(document.createElement(tag))
+    return
   }
 
   // Recursive call for each child of the current node
   node.childNodes.forEach((childNode) => {
     wrapTextInNode(childNode, tag)
+  })
+}
+
+// Function that percolates style tags down to the lowest possible level
+function percolateStyleTags() {
+  const documentElement = document.getElementById("document")
+
+}
+
+// Recursive helper function that percolates a given tag down from a given node
+function percolateTagInNode(node, tag) {
+  if (node.nodeType == Node.TEXT_NODE) {
+    // Base case
+    return
+  }
+
+  if (node.nodeType == Node.ELEMENT_NODE && node.tagName == tag) {
+    // Tag processing
+    node.childNodes.forEach((childNode) => {
+      if (childNode.hasChildNodes()) {
+        // Wrap childNode's children in tag
+      } else {
+        // Wrap text in tag
+      }
+    })
+    // Extract tag's children
+    // Add tag's children as siblings
+    // Delete tag
+  }
+
+  node.childNodes.forEach((childNode) => {
+    percolateTagInNode(childNode, tag)
   })
 }
