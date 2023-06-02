@@ -36,6 +36,7 @@ app.post("/document", upload.single("file"), (req, res, next) => {
 
   const input = { title, content };
 
+  // very important, vital functionality
   if (title == "give me a kitty") {
     console.log("cat zone");
 
@@ -53,7 +54,13 @@ app.post("/document", upload.single("file"), (req, res, next) => {
           height: data.height,
           ...input,
         });
-      });
+      })
+      .catch((err) =>
+        res.status(200).render("documentPage", {
+          important_err: true,
+          ...input,
+        })
+      );
   } else {
     res.status(200).render("documentPage", input);
   }

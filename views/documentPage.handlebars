@@ -3,9 +3,12 @@
 
   <button onClick="saveDocument()">Save File</button>
   <input type="text" id="title" value="{{title}}" />
-
   <article id="document" contenteditable="true">{{{content}}}</article>
+
   {{#if important}}
     <img src="{{src}}" width="{{width}}" height="{{height}}" />
+  {{/if}}
+  {{#if important_err}}
+    <p>No cat available :(</p>
   {{/if}}
 </main>
