@@ -86,12 +86,7 @@ function wrapSelection(tag) {
     endNodeSubrange.surroundContents(document.createElement(tag))
 
     // For each of the remaining nodes, which are entirely contained in the range, recursively wrap the text with the tag
-    const commonAncestor = selectionRange.commonAncestorContainer
-    commonAncestor.childNodes.forEach((childNode) => {
-      if (childNode != commonAncestor.firstChild && childNode != commonAncestor.lastChild) {
-        wrapTextInNode(childNode, tag)
-      }
-    }, commonAncestor)
+
   }
 }
 
@@ -106,10 +101,7 @@ function wrapTextInNode(node, tag) {
     return
   }
 
-  // Recursive call for each child of the current node
-  node.childNodes.forEach((childNode) => {
-    wrapTextInNode(childNode, tag)
-  })
+  // Recursive call
 }
 
 // Function that percolates style tags down to the lowest possible level
