@@ -99,31 +99,44 @@ function wrapSelection(tag) {
     const startNodeSubrange = document.createRange()
     startNodeSubrange.selectNode(selectionRange.startContainer)
     startNodeSubrange.setStart(selectionRange.startContainer, selectionRange.startOffset)
-    startNodeSubrange.surroundContents(document.createElement(tag))
+    const startWrapper = document.createElement(tag)
+    startNodeSubrange.surroundContents(startWrapper)
 
     // Surround the text in the last node of the selection offset by the offset of the end of the selection
     const endNodeSubrange = document.createRange()
     endNodeSubrange.selectNode(selectionRange.endContainer)
     endNodeSubrange.setEnd(selectionRange.endContainer, selectionRange.endOffset)
-    endNodeSubrange.surroundContents(document.createElement(tag))
+    const endWrapper = document.createElement(tag)
+    endNodeSubrange.surroundContents(endWrapper)
 
-    // For each of the remaining nodes, which are entirely contained in the range, recursively wrap the text with the tag
-
+    // For each of the remaining nodes, which are entirely contained in the range, wrap the text with the tag
+    const commonAncestor = selectionRange.commonAncestorContainer
+    let processedChildren = [startNodeSubrange.startContainer, endNodeSubrange.endContainer]
+    wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange)
   }
 }
 
-// Recursive function that wraps all text under a given node with a given tag (string)
-function wrapTextInNode(node, tag) {
-  // Stop the recursion at the level of text nodes, excluding empty text nodes
-  if (node.nodeType == Node.TEXT_NODE && node.textContent != "") {
-    // Wrap text in tags
-    const range = document.createRange()
-    range.selectNodeContents(node)
-    range.surroundContents(document.createElement(tag))
-    return
-  }
+// Function that wraps all text under a given node with a given tag (string) using DFS
+function wrapTextInNode(node, tag, processedChildren, range) {
+  let stack = [node]
+  while (stack.length > 0) {
+    let v = stack.pop()
 
-  // Recursive call
+    if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+      // Wrap text in tags
+      const range = document.createRange()
+      range.selectNode(v)
+      range.surroundContents(document.createElement(tag))
+    }
+
+    if (!processedChildren.includes(v) && range.intersectsNode(v)) {
+      processedChildren.push(v)
+
+      v.childNodes.forEach((childNode) => {
+        stack.push(childNode)
+      })
+    }
+  }
 }
 
 // Function that percolates style tags down to the lowest possible level
