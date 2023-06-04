@@ -30,20 +30,25 @@ function downloadFile(
 
 /** @class Document class representing a document */
 class Document {
-  #doc; // the document DOM element
+  static WYSIWYG = Symbol("WYSIWYG editing mode");
+  static MARKUP = Symbol("Markup editing mode");
+
   #fileName; // the DOM element that holds the file name
+  #doc; // the document DOM element
+  #mode; // Whether the document is in WYSIWYG mode, or markup (html) mode
 
   /**
    * Creates a document from the dom IDs of its title and body
    *
-   * @param {string} docID the dom ID of the element that contains the document
-   *  body (should be content-editable element)
-   * @param {string} fileNameID the dom ID of the element that contains the
-   *  title (should be a text input)
+   * @param {domElement} fileNameID the dom element that contains the title
+   *  (should be a text input)
+   * @param {domElement} docID the dom element that contains the document body
+   *  (should be content-editable element)
    */
-  constructor(docID, fileNameID) {
-    this.#doc = document.getElementById(docID);
-    this.#fileName = document.getElementById(fileNameID);
+  constructor(fileName, doc) {
+    this.#fileName = fileName;
+    this.#doc = doc;
+    this.#mode = Document.WYSIWYG;
   }
 
   /** @getter title gets the title as a string */
@@ -72,13 +77,43 @@ class Document {
   download() {
     downloadFile(this.title, this.htmlText, "text/html", "html");
   }
+
+  swapModes() {
+    if (this.#mode == Document.WYSIWYG) {
+      this.#doc.innerText = this.#doc.innerHTML;
+      this.#mode = Document.MARKUP;
+    } else if (this.#mode == Document.MARKUP) {
+      this.#doc.innerHTML = this.#doc.innerText;
+      this.#mode = Document.WYSIWYG;
+    } else {
+      console.log(`Invalid mode detected: ${this.#mode}`);
+    }
+  }
 }
 
-const workingDoc = new Document("document", "title");
-
-/**
- * function to save document that can be called as an onClick event handler
- */
-function saveDocument() {
-  workingDoc.download();
+function* modeButtonToggle() {
+  while (true) {
+    yield "Swap to Markup";
+    yield "Swap to WYSIWYG";
+  }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const title = document.getElementById("title");
+  const doc = document.getElementById("document");
+
+  const workingDoc = new Document(title, doc);
+
+  const saveButton = document.getElementById("saveButton");
+  saveButton.addEventListener("click", (e) => workingDoc.download(e));
+
+  const modeButton = document.getElementById("modeButton");
+  modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));
+
+  const toggle = modeButtonToggle();
+  modeButton.innerText = toggle.next().value;
+  modeButton.addEventListener(
+    "click",
+    (e) => (modeButton.innerText = toggle.next().value)
+  );
+});
