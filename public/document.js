@@ -114,6 +114,8 @@ function wrapSelection(tag) {
     let processedChildren = [startNodeSubrange.startContainer, endNodeSubrange.endContainer]
     wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange)
   }
+
+  percolateStyleTags()
 }
 
 // Function that wraps all text under a given node with a given tag (string) using DFS
@@ -142,42 +144,50 @@ function wrapTextInNode(node, tag, processedChildren, range) {
 // Function that percolates style tags down to the lowest possible level
 function percolateStyleTags() {
   const documentElement = document.getElementById("document")
+  // List of style tags in the order in which they will be nested from outermost to innermost
+  const tags = ["b", "em", "u"]
 
+  for (let tag of tags) {
+    percolateTagInNode(documentElement, tag)
+  }
 }
 
-// Recursive helper function that percolates a given tag down from a given node
-// node is assumed to have a parent
+// Helper function that percolates a given tag down from a given node
+// tag is assumed to be an element tag
 function percolateTagInNode(node, tag) {
-  if (node.nodeType != Node.ELEMENT_NODE) {
-    // Base case
-    return
-  }
-  const children = node.children
+  let queue = [node]
+  while (queue.length > 0) {
+    let v = queue.shift()
 
-  if (node.tagName.toLowerCase() == tag && children.length > 0) {
-    for (let i = 0; i < children.length; i++) {
-      let child = children.item(i)
+    v.childNodes.forEach((childNode) => {
+      queue.push(childNode)
+    })
 
-      if (child.hasChildNodes() && child.tagName.toLowerCase() != tag) {
-        const range = document.createRange()
-        range.selectNodeContents(child)
-        range.surroundContents(document.createElement(tag))
+    if (v.nodeName.toLowerCase() == tag) {
+      let textOnly = true
+      v.childNodes.forEach((childNode) => {
+        if (childNode.nodeType != Node.TEXT_NODE) {
+          textOnly = false
+        }
+      })
+
+      v.childNodes.forEach((childNode) => {
+        if (childNode.hasChildNodes() && childNode.nodeName.toLowerCase() != tag) {
+          const range = document.createRange()
+          range.selectNodeContents(childNode)
+          range.surroundContents(document.createElement(tag))
+        }
+
+        if (childNode.nodeType == Node.TEXT_NODE && childNode.textContent != "" && !textOnly) {
+          const range = document.createRange()
+          range.selectNode(childNode)
+          range.surroundContents(document.createElement(tag))
+        }
+      })
+
+      if (!textOnly) {
+        v.replaceWith(...v.childNodes)
       }
     }
-
-    for (let i = 0; i < children.length; i++) {
-      percolateTagInNode(children.item(0), tag)
-    }
-
-    const range = document.createRange()
-    range.selectNodeContents(node)
-    const nodeContents = range.extractContents()
-
-    node.replaceWith(nodeContents)
-    return
-  }
-
-  for (let i = 0; i < children.length; i++) {
-    percolateTagInNode(children.item(0), tag)
   }
 }
