@@ -55,12 +55,7 @@ app.post("/document", upload.single("file"), (req, res, next) => {
           ...input,
         });
       })
-      .catch((err) =>
-        res.status(200).render("documentPage", {
-          important_err: true,
-          ...input,
-        })
-      );
+      .catch((err) => res.status(200).render("documentPage", input));
   } else {
     res.status(200).render("documentPage", input);
   }
