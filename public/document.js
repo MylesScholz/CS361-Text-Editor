@@ -1,6 +1,7 @@
 console.log("Document page JavaScript loaded.");
-// List of style tags in the order in which they will be nested from outermost to innermost
-const styleTags = ["b", "em", "u"]
+// List of style tags in the order in which they will be nested from outermost
+// to innermost
+const styleTags = ["b", "em", "u"];
 
 /**
  * Downloads a file onto the client's computer
@@ -30,7 +31,9 @@ function downloadFile(
   document.body.removeChild(a);
 }
 
-/** @class Document class representing a document */
+/**
+ * @class Document class representing a document
+ */
 class Document {
   static WYSIWYG = Symbol("WYSIWYG editing mode");
   static MARKUP = Symbol("Markup editing mode");
@@ -53,7 +56,9 @@ class Document {
     this.#mode = Document.WYSIWYG;
   }
 
-  /** @getter title gets the title as a string */
+  /**
+   * @getter title gets the title as a string
+   */
   get title() {
     return this.#fileName.value;
   }
@@ -80,6 +85,9 @@ class Document {
     downloadFile(this.title, this.htmlText, "text/html", "html");
   }
 
+  /**
+   * Swap the modes of the document between WYSIWYG editing and markup editing
+   */
   swapModes() {
     if (this.#mode == Document.WYSIWYG) {
       this.#doc.innerText = this.#doc.innerHTML;
@@ -93,6 +101,9 @@ class Document {
   }
 }
 
+/**
+ * Helper function that toggles between "Swap to Markup" and "Swap to WYSIWYG"
+ */
 function* modeButtonToggle() {
   while (true) {
     yield "Swap to Markup";
@@ -120,140 +131,181 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 });
 
-// Function that wraps the current selection with a given tag (string)
+/**
+ * Function that wraps the current selection with a given tag (string)
+ *
+ * @param {string} tag the html tag to wrap (e.g. "b", "h2")
+ */
 function wrapSelection(tag) {
-  const selection = document.getSelection()
-  // Note: getRangeAt(0) converts the selection to a Range. There can technically be multiple ranges in the selection,
-  // but very few browsers support that. In practice, the Range at index 0 is the only Range in the selection.
-  const selectionRange = selection.getRangeAt(0)
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
 
   if (selectionRange.commonAncestorContainer == selectionRange.startContainer) {
-    // The selection is within one element; simply surround the range with the tag
-    selectionRange.surroundContents(document.createElement(tag))
+    // The selection is within one element; simply surround the range with the
+    // tag
+    selectionRange.surroundContents(document.createElement(tag));
   } else {
     // The selection spans multiple elements
-    // Surround the text in the first node of the selection offset by the starting offset of the selection
-    const startNodeSubrange = document.createRange()
-    startNodeSubrange.selectNode(selectionRange.startContainer)
-    startNodeSubrange.setStart(selectionRange.startContainer, selectionRange.startOffset)
-    const startWrapper = document.createElement(tag)
-    startNodeSubrange.surroundContents(startWrapper)
+    // Surround the text in the first node of the selection offset by the
+    // starting offset of the selection
+    const startNodeSubrange = document.createRange();
+    startNodeSubrange.selectNode(selectionRange.startContainer);
+    startNodeSubrange.setStart(
+      selectionRange.startContainer,
+      selectionRange.startOffset
+    );
+    const startWrapper = document.createElement(tag);
+    startNodeSubrange.surroundContents(startWrapper);
 
-    // Surround the text in the last node of the selection offset by the offset of the end of the selection
-    const endNodeSubrange = document.createRange()
-    endNodeSubrange.selectNode(selectionRange.endContainer)
-    endNodeSubrange.setEnd(selectionRange.endContainer, selectionRange.endOffset)
-    const endWrapper = document.createElement(tag)
-    endNodeSubrange.surroundContents(endWrapper)
+    // Surround the text in the last node of the selection offset by the offset
+    // of the end of the selection
+    const endNodeSubrange = document.createRange();
+    endNodeSubrange.selectNode(selectionRange.endContainer);
+    endNodeSubrange.setEnd(
+      selectionRange.endContainer,
+      selectionRange.endOffset
+    );
+    const endWrapper = document.createElement(tag);
+    endNodeSubrange.surroundContents(endWrapper);
 
-    // For each of the remaining nodes, which are entirely contained in the range, wrap the text with the tag
-    const commonAncestor = selectionRange.commonAncestorContainer
-    let processedChildren = [startNodeSubrange.startContainer, endNodeSubrange.endContainer]
-    wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange)
+    // For each of the remaining nodes, which are entirely contained in the
+    // range, wrap the text with the tag
+    const commonAncestor = selectionRange.commonAncestorContainer;
+    let processedChildren = [
+      startNodeSubrange.startContainer,
+      endNodeSubrange.endContainer,
+    ];
+    wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange);
   }
 
-  percolateStyleTags()
+  percolateStyleTags();
 }
 
-// Helper function that wraps all text under a given node with a given tag (string) using DFS
+/**
+ * Helper function that wraps all text under a given node with a given tag
+ * (string) using DFS
+ *
+ * @param {string} tag the html tag to wrap (e.g. "b", "h2")
+ *
+ */
 function wrapTextInNode(node, tag, processedChildren, range) {
-  let stack = [node]
+  let stack = [node];
   while (stack.length > 0) {
-    let v = stack.pop()
+    let v = stack.pop();
 
     if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
       // Wrap text in tags
-      const range = document.createRange()
-      range.selectNode(v)
-      range.surroundContents(document.createElement(tag))
+      const range = document.createRange();
+      range.selectNode(v);
+      range.surroundContents(document.createElement(tag));
     }
 
     if (!processedChildren.includes(v) && range.intersectsNode(v)) {
-      processedChildren.push(v)
+      processedChildren.push(v);
 
       v.childNodes.forEach((childNode) => {
-        stack.push(childNode)
-      })
+        stack.push(childNode);
+      });
     }
   }
 }
 
-// Function that percolates style tags down to the lowest possible level
+/**
+ * Function that percolates style tags down to the lowest possible level
+ */
 function percolateStyleTags() {
-  const documentElement = document.getElementById("document")
+  const documentElement = document.getElementById("document");
 
   for (let tag of styleTags) {
-    percolateTagInNode(documentElement, tag)
+    percolateTagInNode(documentElement, tag);
   }
 }
 
-// Helper function that percolates a given tag down from a given node
-// tag is assumed to be an element tag
+/**
+ * Helper function that percolates a given tag down from a given node
+ *
+ * @param {string} tag the html tag to wrap. Assumed to be an element tag
+ */
 function percolateTagInNode(node, tag) {
-  let queue = [node]
+  let queue = [node];
   while (queue.length > 0) {
-    let v = queue.shift()
+    let v = queue.shift();
 
     v.childNodes.forEach((childNode) => {
-      queue.push(childNode)
-    })
+      queue.push(childNode);
+    });
 
     if (v.nodeName.toLowerCase() == tag) {
-      let textOnly = true
+      let textOnly = true;
       v.childNodes.forEach((childNode) => {
         if (childNode.nodeType != Node.TEXT_NODE) {
-          textOnly = false
+          textOnly = false;
         }
-      })
+      });
 
       v.childNodes.forEach((childNode) => {
-        if (childNode.hasChildNodes() && childNode.nodeName.toLowerCase() != tag) {
-          const range = document.createRange()
-          range.selectNodeContents(childNode)
-          range.surroundContents(document.createElement(tag))
+        if (
+          childNode.hasChildNodes() &&
+          childNode.nodeName.toLowerCase() != tag
+        ) {
+          const range = document.createRange();
+          range.selectNodeContents(childNode);
+          range.surroundContents(document.createElement(tag));
         }
 
-        if (childNode.nodeType == Node.TEXT_NODE && childNode.textContent != "" && !textOnly) {
-          const range = document.createRange()
-          range.selectNode(childNode)
-          range.surroundContents(document.createElement(tag))
+        if (
+          childNode.nodeType == Node.TEXT_NODE &&
+          childNode.textContent != "" &&
+          !textOnly
+        ) {
+          const range = document.createRange();
+          range.selectNode(childNode);
+          range.surroundContents(document.createElement(tag));
         }
-      })
+      });
 
       if (!textOnly) {
-        v.replaceWith(...v.childNodes)
+        v.replaceWith(...v.childNodes);
       }
     }
   }
 }
 
-// Function that removes a tag from the selection, given a style tag string
-// tag is assumed to be a style tag
-// Does not handle partially selected text
+/**
+ * Function that removes a tag from the selection, given a style tag string
+ *
+ * @param {string} tag the html tag to remove. Assumed to be a style tag
+ */
 function unwrapSelection(tag) {
-  const selection = document.getSelection()
-  // Note: getRangeAt(0) converts the selection to a Range. There can technically be multiple ranges in the selection,
-  // but very few browsers support that. In practice, the Range at index 0 is the only Range in the selection.
-  const selectionRange = selection.getRangeAt(0)
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
 
-  let processedNodes = []
-  let stack = [selectionRange.commonAncestorContainer]
+  let processedNodes = [];
+  let stack = [selectionRange.commonAncestorContainer];
   while (stack.length > 0) {
-    let v = stack.pop()
+    let v = stack.pop();
 
     if (!processedNodes.includes(v) && selectionRange.intersectsNode(v)) {
       if (v.nodeType == Node.TEXT_NODE) {
-        let closestTag = v.parentElement.closest(tag)
+        let closestTag = v.parentElement.closest(tag);
         if (closestTag != null) {
-          closestTag.replaceWith(...closestTag.childNodes)
+          closestTag.replaceWith(...closestTag.childNodes);
         }
       }
 
       v.childNodes.forEach((childNode) => {
-        stack.push(childNode)
-      })
+        stack.push(childNode);
+      });
     }
   }
 
-  percolateStyleTags()
+  percolateStyleTags();
 }
