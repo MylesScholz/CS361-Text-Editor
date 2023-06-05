@@ -1,4 +1,6 @@
 console.log("Document page JavaScript loaded.");
+// List of style tags in the order in which they will be nested from outermost to innermost
+const styleTags = ["b", "em", "u"]
 
 /**
  * Downloads a file onto the client's computer
@@ -118,7 +120,7 @@ function wrapSelection(tag) {
   percolateStyleTags()
 }
 
-// Function that wraps all text under a given node with a given tag (string) using DFS
+// Helper function that wraps all text under a given node with a given tag (string) using DFS
 function wrapTextInNode(node, tag, processedChildren, range) {
   let stack = [node]
   while (stack.length > 0) {
@@ -144,10 +146,8 @@ function wrapTextInNode(node, tag, processedChildren, range) {
 // Function that percolates style tags down to the lowest possible level
 function percolateStyleTags() {
   const documentElement = document.getElementById("document")
-  // List of style tags in the order in which they will be nested from outermost to innermost
-  const tags = ["b", "em", "u"]
 
-  for (let tag of tags) {
+  for (let tag of styleTags) {
     percolateTagInNode(documentElement, tag)
   }
 }
@@ -190,4 +190,35 @@ function percolateTagInNode(node, tag) {
       }
     }
   }
+}
+
+// Function that removes a tag from the selection, given a style tag string
+// tag is assumed to be a style tag
+// Does not handle partially selected text
+function unwrapSelection(tag) {
+  const selection = document.getSelection()
+  // Note: getRangeAt(0) converts the selection to a Range. There can technically be multiple ranges in the selection,
+  // but very few browsers support that. In practice, the Range at index 0 is the only Range in the selection.
+  const selectionRange = selection.getRangeAt(0)
+
+  let processedNodes = []
+  let stack = [selectionRange.commonAncestorContainer]
+  while (stack.length > 0) {
+    let v = stack.pop()
+
+    if (!processedNodes.includes(v) && selectionRange.intersectsNode(v)) {
+      if (v.nodeType == Node.TEXT_NODE) {
+        let closestTag = v.parentElement.closest(tag)
+        if (closestTag != null) {
+          closestTag.replaceWith(...closestTag.childNodes)
+        }
+      }
+
+      v.childNodes.forEach((childNode) => {
+        stack.push(childNode)
+      })
+    }
+  }
+
+  percolateStyleTags()
 }
