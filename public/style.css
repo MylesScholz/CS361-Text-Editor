@@ -77,8 +77,7 @@ a:hover {
   background-color: #20202e;
   display: flex;
   flex-direction: column;
-  padding: 10ch;
-  height: 100%;
+  padding: 100px;
 }
 
 #document {
@@ -90,43 +89,75 @@ a:hover {
 }
 
 #ribbon {
-  width:100%;
   display: flex;
   flex-direction: row;
-  gap:3px;
-  height:67px;
-  padding-left: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background-color: #313147;
-  overflow: auto;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #16161e;
+  user-select: none;
 }
 
-.formatButton {
+#format-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 20px;
+}
+
+#style-format-button-container,
+#structure-format-button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 5px;
+}
+
+#apply-style-format-button-container,
+#remove-style-format-button-container,
+#apply-structure-format-button-container,
+#remove-structure-format-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 5px;
+}
+
+#apply-style-format-button-container .format-button,
+#remove-style-format-button-container .format-button {
+  width: 42px;
+}
+
+.format-button {
   background-color: aliceblue;
   text-align: center;
-  width:40px;
-  height:fit-content;
+  height: fit-content;
   cursor: pointer;
-  float:inline-start;
-  padding: 12px 0;
-  color: black;
+  float: inline-start;
+  padding: 10px;
+  color: #82e5b4;
   font-size: 15px;
-  border-radius: 15px;
+  border: 2px solid #82e5b4;
+  border-radius: 10px;
+  background-color: #16161e;
 }
 
-#stitleButton {
-  width: 70px;
+#state-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 5px;
+  margin: 20px 0px;
 }
 
-#cstitleButton {
-  width: 70px;
+.state-button {
+  display: inline-block;
+  border: 2px solid #82e5b4;
+  border-radius: 10px;
+  background-color: #16161e;
+  color: #82e5b4;
+  cursor: pointer;
 }
 
-#saveButton {
-  justify-self:right;
-}
-
-#modeButton {
-  justify-self:right;
+#title {
+  margin: 10px 0px;
 }

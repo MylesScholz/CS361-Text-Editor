@@ -117,41 +117,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const workingDoc = new Document(title, doc);
 
-  const saveButton = document.getElementById("saveButton");
+  const saveButton = document.getElementById("save-button");
   saveButton.addEventListener("click", (e) => workingDoc.download(e));
 
-  const modeButton = document.getElementById("modeButton");
+  const modeButton = document.getElementById("mode-button");
   modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));
 
-  const boldButton = document.getElementById("boldButton");
+  const boldButton = document.getElementById("bold-button");
   boldButton.addEventListener("click", (e) => wrapSelection("b"));
 
-  const italicButton = document.getElementById("italicButton");
+  const italicButton = document.getElementById("italic-button");
   italicButton.addEventListener("click", (e) => wrapSelection("em"));
 
-  const ulButton = document.getElementById("ulButton");
+  const ulButton = document.getElementById("underline-button");
   ulButton.addEventListener("click", (e) => wrapSelection("u"));
 
-  const cboldButton = document.getElementById("cboldButton");
+  const cboldButton = document.getElementById("remove-bold-button");
   cboldButton.addEventListener("click", (e) => unwrapSelection("b"));
 
-  const citalicButton = document.getElementById("citalicButton");
+  const citalicButton = document.getElementById("remove-italic-button");
   citalicButton.addEventListener("click", (e) => unwrapSelection("em"));
 
-  const culButton = document.getElementById("culButton");
+  const culButton = document.getElementById("remove-underline-button");
   culButton.addEventListener("click", (e) => unwrapSelection("u"));
 
-  const titleButton = document.getElementById("titleButton");
-  titleButton.addEventListener("click", (e) => wrapSelection("h1"));
+  const titleButton = document.getElementById("title-button");
+  titleButton.addEventListener("click", (e) => replaceSelectionLines("h1"));
 
-  const stitleButton = document.getElementById("stitleButton");
-  stitleButton.addEventListener("click", (e) => wrapSelection("h2"));
+  const stitleButton = document.getElementById("subtitle-button");
+  stitleButton.addEventListener("click", (e) => replaceSelectionLines("h3"));
 
-  const ctitleButton = document.getElementById("ctitleButton");
-  ctitleButton.addEventListener("click", (e) => unwrapSelection("h1"));
+  const unorderedListButton = document.getElementById("unordered-list-button");
+  unorderedListButton.addEventListener("click", (e) => {
+    replaceSelectionLines("li")
+    surroundSelection("ul")
+  });
 
-  const cstitleButton = document.getElementById("cstitleButton");
-  cstitleButton.addEventListener("click", (e) => unwrapSelection("h2"));
+  const orderedListButton = document.getElementById("ordered-list-button");
+  orderedListButton.addEventListener("click", (e) => {
+    replaceSelectionLines("li")
+    surroundSelection("ol")
+  });
+
+  const ctitleButton = document.getElementById("remove-title-button");
+  ctitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
+
+  const cstitleButton = document.getElementById("remove-subtitle-button");
+  cstitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
+
+  const removeUnorderedListButton = document.getElementById("remove-unordered-list-button");
+  removeUnorderedListButton.addEventListener("click", (e) => removeList("ul"));
+
+  const removeOrderedListButton = document.getElementById("remove-ordered-list-button");
+  removeOrderedListButton.addEventListener("click", (e) => removeList("ol"));
 
   const toggle = modeButtonToggle();
   modeButton.innerText = toggle.next().value;
@@ -180,27 +198,23 @@ function wrapSelection(tag) {
     selectionRange.surroundContents(document.createElement(tag));
   } else {
     // The selection spans multiple elements
-    // Surround the text in the first node of the selection offset by the
-    // starting offset of the selection
+    // The selection may cover part of the node it starts in.
+    // Create a subrange selecting this partially selected node.
     const startNodeSubrange = document.createRange();
     startNodeSubrange.selectNode(selectionRange.startContainer);
     startNodeSubrange.setStart(
       selectionRange.startContainer,
       selectionRange.startOffset
     );
-    const startWrapper = document.createElement(tag);
-    startNodeSubrange.surroundContents(startWrapper);
 
-    // Surround the text in the last node of the selection offset by the offset
-    // of the end of the selection
+    // The selection may cover part of the node it ends in.
+    // Create a subrange selecting this partially selected node.
     const endNodeSubrange = document.createRange();
     endNodeSubrange.selectNode(selectionRange.endContainer);
     endNodeSubrange.setEnd(
       selectionRange.endContainer,
       selectionRange.endOffset
     );
-    const endWrapper = document.createElement(tag);
-    endNodeSubrange.surroundContents(endWrapper);
 
     // For each of the remaining nodes, which are entirely contained in the
     // range, wrap the text with the tag
@@ -210,9 +224,17 @@ function wrapSelection(tag) {
       endNodeSubrange.endContainer,
     ];
     wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange);
+
+    // Wrap the starting and ending nodes with the tag.
+    // The starting and ending nodes will always be text nodes.
+    const startWrapper = document.createElement(tag);
+    startNodeSubrange.surroundContents(startWrapper);
+    const endWrapper = document.createElement(tag);
+    endNodeSubrange.surroundContents(endWrapper);
   }
 
-  percolateStyleTags();
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
 }
 
 /**
@@ -227,15 +249,15 @@ function wrapTextInNode(node, tag, processedChildren, range) {
   while (stack.length > 0) {
     let v = stack.pop();
 
-    if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
-      // Wrap text in tags
-      const range = document.createRange();
-      range.selectNode(v);
-      range.surroundContents(document.createElement(tag));
-    }
-
     if (!processedChildren.includes(v) && range.intersectsNode(v)) {
       processedChildren.push(v);
+
+      if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+        // Wrap text in tags
+        const range = document.createRange();
+        range.selectNode(v);
+        range.surroundContents(document.createElement(tag));
+      }
 
       v.childNodes.forEach((childNode) => {
         stack.push(childNode);
@@ -337,5 +359,98 @@ function unwrapSelection(tag) {
     }
   }
 
-  percolateStyleTags();
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
+}
+
+function replaceSelectionLines(tag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  let commonAncestor = selectionRange.commonAncestorContainer
+  if (commonAncestor.nodeType == Node.TEXT_NODE) {
+    commonAncestor = commonAncestor.parentElement
+  }
+  let queue = [commonAncestor]
+
+  while (queue.length > 0) {
+    let v = queue.shift()
+
+    if (v.nodeType == Node.ELEMENT_NODE && v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")) {
+      const range = document.createRange()
+      range.selectNodeContents(v)
+      range.surroundContents(document.createElement(tag))
+      v.replaceWith(...v.childNodes)
+    } else if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+      const range = document.createRange()
+      range.selectNode(v)
+      range.surroundContents(document.createElement(tag))
+    } else {
+      v.childNodes.forEach((childNode) => {
+        queue.push(childNode)
+      })
+    }
+  }
+
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
+}
+
+function surroundSelection(tag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  const range = document.createRange()
+  range.selectNodeContents(selectionRange.commonAncestorContainer)
+  range.surroundContents(document.createElement(tag))
+
+  selection.collapse(selectionRange.startContainer)
+}
+
+function removeList(listTag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  const closestList = selectionRange.startContainer.parentElement.closest(listTag)
+  const listExtract = document.createDocumentFragment()
+
+  let commonAncestor = selectionRange.commonAncestorContainer
+  if (commonAncestor.nodeType == Node.TEXT_NODE) {
+    commonAncestor = commonAncestor.parentElement
+  }
+  let queue = [commonAncestor]
+  while (queue.length > 0) {
+    let v = queue.shift()
+
+    if (v.nodeType == Node.ELEMENT_NODE && v.matches("li") && selectionRange.intersectsNode(v)) {
+      const range = document.createRange()
+      range.selectNodeContents(v)
+      range.surroundContents(document.createElement("div"))
+      listExtract.appendChild(range.extractContents())
+      v.remove()
+    } else {
+      v.childNodes.forEach((childNode) => {
+        queue.push(childNode)
+      })
+    }
+  }
+  closestList.after(listExtract)
+
+  if (closestList.children.length == 0) {
+    closestList.remove()
+  }
+
+  selection.collapse(selectionRange.startContainer)
 }
