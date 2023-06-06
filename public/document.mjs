@@ -140,7 +140,7 @@ function periodicSave(document) {
     document.backup();
     setTimeout(() => {
       autobackup(document)
-    }, backupFrequency);  
+    }, backupFrequency);
   }
 
   setTimeout(() => autobackup(document), backupFrequency)
@@ -162,8 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const saveButton = document.getElementById("save-button");
   saveButton.addEventListener("click", (e) => {
     workingDoc
-     .backup()
-     .catch((e) => console.log(`backup error: ${e}`))
+      .backup()
+      .catch((e) => console.log(`backup error: ${e}`))
   });
 
   const exportButton = document.getElementById("export-button");
