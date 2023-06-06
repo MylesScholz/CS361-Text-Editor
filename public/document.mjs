@@ -140,7 +140,7 @@ function periodicSave(document) {
     document.backup();
     setTimeout(() => {
       autobackup(document)
-    }, backupFrequency);  
+    }, backupFrequency);
   }
 
   setTimeout(() => autobackup(document), backupFrequency)
@@ -159,14 +159,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   periodicSave(workingDoc);
 
-  const saveButton = document.getElementById("saveButton");
+  const saveButton = document.getElementById("save-button");
   saveButton.addEventListener("click", (e) => {
     workingDoc
-     .backup()
-     .catch((e) => console.log(`backup error: ${e}`))
+      .backup()
+      .catch((e) => console.log(`backup error: ${e}`))
   });
 
-  const exportButton = document.getElementById("exportButton");
+  const exportButton = document.getElementById("export-button");
   exportButton.addEventListener("click", (e) => workingDoc.download(e));
 
   const modeButton = document.getElementById("mode-button");
