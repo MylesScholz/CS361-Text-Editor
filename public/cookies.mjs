@@ -23,7 +23,7 @@ export async function getUserCookie() {
       method: "GET",
     });
     const { _id: cookie } = await response.json();
-    document.cookie = `userCookie=${cookie}; SameSite=None; Secure`;
+    document.cookie = `userCookie=${cookie}; SameSite=None; Secure; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
     console.log(`fetched new user cookie: ${cookie}`);
   } else {
     console.log(`existing user cookie: ${userCookie}`);
