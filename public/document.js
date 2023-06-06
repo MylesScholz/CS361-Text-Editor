@@ -150,27 +150,23 @@ function wrapSelection(tag) {
     selectionRange.surroundContents(document.createElement(tag));
   } else {
     // The selection spans multiple elements
-    // Surround the text in the first node of the selection offset by the
-    // starting offset of the selection
+    // The selection may cover part of the node it starts in.
+    // Create a subrange selecting this partially selected node.
     const startNodeSubrange = document.createRange();
     startNodeSubrange.selectNode(selectionRange.startContainer);
     startNodeSubrange.setStart(
       selectionRange.startContainer,
       selectionRange.startOffset
     );
-    const startWrapper = document.createElement(tag);
-    startNodeSubrange.surroundContents(startWrapper);
 
-    // Surround the text in the last node of the selection offset by the offset
-    // of the end of the selection
+    // The selection may cover part of the node it ends in.
+    // Create a subrange selecting this partially selected node.
     const endNodeSubrange = document.createRange();
     endNodeSubrange.selectNode(selectionRange.endContainer);
     endNodeSubrange.setEnd(
       selectionRange.endContainer,
       selectionRange.endOffset
     );
-    const endWrapper = document.createElement(tag);
-    endNodeSubrange.surroundContents(endWrapper);
 
     // For each of the remaining nodes, which are entirely contained in the
     // range, wrap the text with the tag
@@ -180,6 +176,13 @@ function wrapSelection(tag) {
       endNodeSubrange.endContainer,
     ];
     wrapTextInNode(commonAncestor, tag, processedChildren, selectionRange);
+
+    // Wrap the starting and ending nodes with the tag.
+    // The starting and ending nodes will always be text nodes.
+    const startWrapper = document.createElement(tag);
+    startNodeSubrange.surroundContents(startWrapper);
+    const endWrapper = document.createElement(tag);
+    endNodeSubrange.surroundContents(endWrapper);
   }
 
   percolateStyleTags();
@@ -197,15 +200,15 @@ function wrapTextInNode(node, tag, processedChildren, range) {
   while (stack.length > 0) {
     let v = stack.pop();
 
-    if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
-      // Wrap text in tags
-      const range = document.createRange();
-      range.selectNode(v);
-      range.surroundContents(document.createElement(tag));
-    }
-
     if (!processedChildren.includes(v) && range.intersectsNode(v)) {
       processedChildren.push(v);
+
+      if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+        // Wrap text in tags
+        const range = document.createRange();
+        range.selectNode(v);
+        range.surroundContents(document.createElement(tag));
+      }
 
       v.childNodes.forEach((childNode) => {
         stack.push(childNode);
@@ -308,4 +311,16 @@ function unwrapSelection(tag) {
   }
 
   percolateStyleTags();
+}
+
+function wrapSelectionLines(tag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  const closestLineElement = selectionRange.startContainer.parentElement.closest("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")
+  console.log(closestLineElement)
 }
