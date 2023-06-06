@@ -142,16 +142,16 @@ document.addEventListener("DOMContentLoaded", function () {
   culButton.addEventListener("click", (e) => unwrapSelection("u"));
 
   const titleButton = document.getElementById("titleButton");
-  titleButton.addEventListener("click", (e) => wrapSelection("h1"));
+  titleButton.addEventListener("click", (e) => replaceSelectionLines("h1"));
 
   const stitleButton = document.getElementById("stitleButton");
-  stitleButton.addEventListener("click", (e) => wrapSelection("h2"));
+  stitleButton.addEventListener("click", (e) => replaceSelectionLines("h3"));
 
   const ctitleButton = document.getElementById("ctitleButton");
-  ctitleButton.addEventListener("click", (e) => unwrapSelection("h1"));
+  ctitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
   const cstitleButton = document.getElementById("cstitleButton");
-  cstitleButton.addEventListener("click", (e) => unwrapSelection("h2"));
+  cstitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
   const toggle = modeButtonToggle();
   modeButton.innerText = toggle.next().value;
@@ -215,7 +215,8 @@ function wrapSelection(tag) {
     endNodeSubrange.surroundContents(endWrapper);
   }
 
-  percolateStyleTags();
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
 }
 
 /**
@@ -340,10 +341,11 @@ function unwrapSelection(tag) {
     }
   }
 
-  percolateStyleTags();
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
 }
 
-function wrapSelectionLines(tag) {
+function replaceSelectionLines(tag) {
   const selection = document.getSelection();
   // Note: getRangeAt(0) converts the selection to a Range. There can
   // technically be multiple ranges in the selection, but very few browsers
@@ -351,6 +353,27 @@ function wrapSelectionLines(tag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  const closestLineElement = selectionRange.startContainer.parentElement.closest("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")
-  console.log(closestLineElement)
+  let queue = [selectionRange.commonAncestorContainer]
+
+  while (queue.length > 0) {
+    let v = queue.shift()
+
+    if (v.nodeType == Node.ELEMENT_NODE && v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")) {
+      const range = document.createRange()
+      range.selectNodeContents(v)
+      range.surroundContents(document.createElement(tag))
+      v.replaceWith(...v.childNodes)
+    } else if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+      const range = document.createRange()
+      range.selectNode(v)
+      range.surroundContents(document.createElement(tag))
+    } else {
+      v.childNodes.forEach((childNode) => {
+        queue.push(childNode)
+      })
+    }
+  }
+
+  percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
 }
