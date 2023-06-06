@@ -1,4 +1,5 @@
-console.log("Document page JavaScript loaded.");
+import { getUserCookie } from "/cookies.mjs";
+
 // List of style tags in the order in which they will be nested from outermost
 // to innermost
 const styleTags = ["b", "em", "u"];
@@ -41,6 +42,7 @@ class Document {
   #fileName; // the DOM element that holds the file name
   #doc; // the document DOM element
   #mode; // Whether the document is in WYSIWYG mode, or markup (html) mode
+  #docid; // the document ID
 
   /**
    * Creates a document from the dom IDs of its title and body
@@ -50,10 +52,11 @@ class Document {
    * @param {domElement} docID the dom element that contains the document body
    *  (should be content-editable element)
    */
-  constructor(fileName, doc) {
+  constructor(fileName, doc, docid) {
     this.#fileName = fileName;
     this.#doc = doc;
     this.#mode = Document.WYSIWYG;
+    this.#docid = docid;
   }
 
   /**
@@ -85,6 +88,22 @@ class Document {
     downloadFile(this.title, this.htmlText, "text/html", "html");
   }
 
+  async backup() {
+    console.log("backing up document.")
+
+    const response = await fetch(`/document/backup?docid=${this.#docid}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: this.title,
+        content: this.htmlText,
+      })
+    })
+    console.log(`Backup performed: ${response}`)
+  }
+
   /**
    * Swap the modes of the document between WYSIWYG editing and markup editing
    */
@@ -111,14 +130,44 @@ function* modeButtonToggle() {
   }
 }
 
+function periodicSave(document) {
+  const backupFrequency = 30 * 1000
+
+  console.log("starting backups.")
+
+  function autobackup(document) {
+    console.log("autobackup...")
+    document.backup();
+    setTimeout(() => {
+      autobackup(document)
+    }, backupFrequency);
+  }
+
+  setTimeout(() => autobackup(document), backupFrequency)
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("Document page JavaScript loaded.");
+
+  getUserCookie().catch((e) => console.log("Could not access cookie"));
+
+  const docid = document.getElementById("docid").innerText;
   const title = document.getElementById("title");
   const doc = document.getElementById("document");
 
-  const workingDoc = new Document(title, doc);
+  const workingDoc = new Document(title, doc, docid);
+
+  periodicSave(workingDoc);
 
   const saveButton = document.getElementById("save-button");
-  saveButton.addEventListener("click", (e) => workingDoc.download(e));
+  saveButton.addEventListener("click", (e) => {
+    workingDoc
+      .backup()
+      .catch((e) => console.log(`backup error: ${e}`))
+  });
+
+  const exportButton = document.getElementById("export-button");
+  exportButton.addEventListener("click", (e) => workingDoc.download(e));
 
   const modeButton = document.getElementById("mode-button");
   modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));

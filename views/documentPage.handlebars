@@ -1,5 +1,7 @@
 <main id="document-container">
-  <script src="document.js" type="text/javascript" defer></script>
+  <script type="module" src="cookies.mjs"></script>
+  <script type="module" src="document.mjs" defer></script>
+  <p hidden id="docid">{{docid}}</p>
 
   <div id="ribbon">
     <div id="format-button-container">
@@ -32,6 +34,7 @@
     </div>
     <div id="state-button-container">
       <button class="state-button" id="save-button">Save File</button>
+      <button class="state-button" id="export-button">Export File</button>
       <button class="state-button" id="mode-button">Swap Modes</button>
     </div>
   </div>
