@@ -88,3 +88,45 @@ a:hover {
   color: #000000;
   outline: none;
 }
+
+#ribbon {
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  gap:3px;
+  height:67px;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #313147;
+  overflow: auto;
+}
+
+.formatButton {
+  background-color: aliceblue;
+  text-align: center;
+  width:40px;
+  height:fit-content;
+  cursor: pointer;
+  float:inline-start;
+  padding: 12px 0;
+  color: black;
+  font-size: 15px;
+  border-radius: 15px;
+}
+
+#stitleButton {
+  width: 70px;
+}
+
+#cstitleButton {
+  width: 70px;
+}
+
+#saveButton {
+  justify-self:right;
+}
+
+#modeButton {
+  justify-self:right;
+}

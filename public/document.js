@@ -123,6 +123,36 @@ document.addEventListener("DOMContentLoaded", function () {
   const modeButton = document.getElementById("modeButton");
   modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));
 
+  const boldButton = document.getElementById("boldButton");
+  boldButton.addEventListener("click", (e) => wrapSelection("b"));
+
+  const italicButton = document.getElementById("italicButton");
+  italicButton.addEventListener("click", (e) => wrapSelection("em"));
+
+  const ulButton = document.getElementById("ulButton");
+  ulButton.addEventListener("click", (e) => wrapSelection("u"));
+
+  const cboldButton = document.getElementById("cboldButton");
+  cboldButton.addEventListener("click", (e) => unwrapSelection("b"));
+
+  const citalicButton = document.getElementById("citalicButton");
+  citalicButton.addEventListener("click", (e) => unwrapSelection("em"));
+
+  const culButton = document.getElementById("culButton");
+  culButton.addEventListener("click", (e) => unwrapSelection("u"));
+
+  const titleButton = document.getElementById("titleButton");
+  titleButton.addEventListener("click", (e) => wrapSelection("h1"));
+
+  const stitleButton = document.getElementById("stitleButton");
+  stitleButton.addEventListener("click", (e) => wrapSelection("h2"));
+
+  const ctitleButton = document.getElementById("ctitleButton");
+  ctitleButton.addEventListener("click", (e) => unwrapSelection("h1"));
+
+  const cstitleButton = document.getElementById("cstitleButton");
+  cstitleButton.addEventListener("click", (e) => unwrapSelection("h2"));
+
   const toggle = modeButtonToggle();
   modeButton.innerText = toggle.next().value;
   modeButton.addEventListener(
