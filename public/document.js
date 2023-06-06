@@ -117,40 +117,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const workingDoc = new Document(title, doc);
 
-  const saveButton = document.getElementById("saveButton");
+  const saveButton = document.getElementById("save-button");
   saveButton.addEventListener("click", (e) => workingDoc.download(e));
 
-  const modeButton = document.getElementById("modeButton");
+  const modeButton = document.getElementById("mode-button");
   modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));
 
-  const boldButton = document.getElementById("boldButton");
+  const boldButton = document.getElementById("bold-button");
   boldButton.addEventListener("click", (e) => wrapSelection("b"));
 
-  const italicButton = document.getElementById("italicButton");
+  const italicButton = document.getElementById("italic-button");
   italicButton.addEventListener("click", (e) => wrapSelection("em"));
 
-  const ulButton = document.getElementById("ulButton");
+  const ulButton = document.getElementById("underline-button");
   ulButton.addEventListener("click", (e) => wrapSelection("u"));
 
-  const cboldButton = document.getElementById("cboldButton");
+  const cboldButton = document.getElementById("remove-bold-button");
   cboldButton.addEventListener("click", (e) => unwrapSelection("b"));
 
-  const citalicButton = document.getElementById("citalicButton");
+  const citalicButton = document.getElementById("remove-italic-button");
   citalicButton.addEventListener("click", (e) => unwrapSelection("em"));
 
-  const culButton = document.getElementById("culButton");
+  const culButton = document.getElementById("remove-underline-button");
   culButton.addEventListener("click", (e) => unwrapSelection("u"));
 
-  const titleButton = document.getElementById("titleButton");
+  const titleButton = document.getElementById("title-button");
   titleButton.addEventListener("click", (e) => replaceSelectionLines("h1"));
 
-  const stitleButton = document.getElementById("stitleButton");
+  const stitleButton = document.getElementById("subtitle-button");
   stitleButton.addEventListener("click", (e) => replaceSelectionLines("h3"));
 
-  const ctitleButton = document.getElementById("ctitleButton");
+  const ctitleButton = document.getElementById("remove-title-button");
   ctitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
-  const cstitleButton = document.getElementById("cstitleButton");
+  const cstitleButton = document.getElementById("remove-subtitle-button");
   cstitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
   const toggle = modeButtonToggle();
@@ -353,7 +353,11 @@ function replaceSelectionLines(tag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  let queue = [selectionRange.commonAncestorContainer]
+  let commonAncestor = selectionRange.commonAncestorContainer
+  if (commonAncestor.nodeType == Node.TEXT_NODE) {
+    commonAncestor = commonAncestor.parentElement
+  }
+  let queue = [commonAncestor]
 
   while (queue.length > 0) {
     let v = queue.shift()
@@ -375,5 +379,20 @@ function replaceSelectionLines(tag) {
   }
 
   percolateStyleTags()
+  selection.collapse(selectionRange.startContainer)
+}
+
+function surroundSelection(tag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  const range = document.createRange()
+  range.selectNodeContents(selectionRange.commonAncestorContainer)
+  range.surroundContents(document.createElement(tag))
+
   selection.collapse(selectionRange.startContainer)
 }
