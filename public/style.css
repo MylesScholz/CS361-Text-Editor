@@ -78,7 +78,7 @@ a:hover {
 }
 
 button:hover,
-#file-browse-button:hover,
+#fileInput::file-selector-button:hover,
 #submitButton:hover {
   background-color: #20202e;
 }
