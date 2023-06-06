@@ -4,21 +4,50 @@
   <p hidden id="docid">{{docid}}</p>
 
   <div id="ribbon">
-    <button class="formatButton" id="boldButton"><strong>B</strong></button>
-    <button class="formatButton" id="italicButton"><em>I</em></button>
-    <button class="formatButton" id="ulButton"><u>U</u></button>
-    <button class="formatButton" id="cboldButton"><s>B</s></button>
-    <button class="formatButton" id="citalicButton"><s>I</s></button>
-    <button class="formatButton" id="culButton"><s>U</s></button>
-    <button class="formatButton" id="titleButton"><u>Title</u></button>
-    <button class="formatButton" id="stitleButton"><u>Subtitle</u></button>
-    <button class="formatButton" id="ctitleButton"><s>Title</s></button>
-    <button class="formatButton" id="cstitleButton"><s>Subtitle</s></button>
-    <button id="saveButton">Save File</button>
-    <button id="exportButton">Export File</button>
-    <button id="modeButton">Swap Modes</button>
+    <div id="format-button-container">
+      <div id="style-format-button-container">
+        <div id="apply-style-format-button-container">
+          <button class="format-button" id="bold-button"><b>B</b></button>
+          <button class="format-button" id="italic-button"><em>I</em></button>
+          <button class="format-button" id="underline-button"><u>U</u></button>
+        </div>
+        <div id="remove-style-format-button-container">
+          <button class="format-button" id="remove-bold-button"><s>B</s></button>
+          <button class="format-button" id="remove-italic-button"><s>I</s></button>
+          <button class="format-button" id="remove-underline-button"><s>U</s></button>
+        </div>
+      </div>
+      <div id="structure-format-button-container">
+        <div id="apply-structure-format-button-container">
+          <button class="format-button" id="title-button">Title</button>
+          <button class="format-button" id="subtitle-button">Subtitle</button>
+          <button class="format-button" id="unordered-list-button">Bulleted List</button>
+          <button class="format-button" id="ordered-list-button">Numbered List</button>
+        </div>
+        <div id="remove-structure-format-button-container">
+          <button class="format-button" id="remove-title-button"><s>Title</s></button>
+          <button class="format-button" id="remove-subtitle-button"><s>Subtitle</s></button>
+          <button class="format-button" id="remove-unordered-list-button"><s>Bulleted List</s></button>
+          <button class="format-button" id="remove-ordered-list-button"><s>Numbered List</s></button>
+        </div>
+      </div>
+    </div>
+    <div id="state-button-container">
+      <button class="state-button" id="save-button">Save File</button>
+      <button class="state-button" id="exportButton">Export File</button>
+      <button class="state-button" id="mode-button">Swap Modes</button>
+    </div>
+>>>>>>> main
   </div>
 
   <input type="text" id="title" value="{{title}}" />
   <article id="document" contenteditable="true">{{{content}}}</article>
+<<<<<<< HEAD
 </main>
+=======
+
+  {{#if important}}
+    <img src="{{src}}" width="{{width}}" height="{{height}}" />
+  {{/if}}
+</main>
+>>>>>>> main
