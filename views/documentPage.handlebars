@@ -1,8 +1,24 @@
+
 <main id="document-container">
   <script src="document.js" type="text/javascript" defer></script>
 
-  <button id="saveButton">Save File</button>
-  <button id="modeButton">Swap Modes</button>
+  <div id="ribbon">
+    <button class="formatButton" id="boldButton"><strong>B</strong></button>
+    <button class="formatButton" id="italicButton"><em>I</em></button>
+    <button class="formatButton" id="ulButton"><u>U</u></button>
+    <button class="formatButton" id="cboldButton"><s>B</s></button>
+    <button class="formatButton" id="citalicButton"><s>I</s></button>
+    <button class="formatButton" id="culButton"><s>U</s></button>
+    <button class="formatButton" id="titleButton"><u>Title</u></button>
+    <button class="formatButton" id="stitleButton"><u>Subtitle</u></button>
+    <button class="formatButton" id="ctitleButton"><s>Title</s></button>
+    <button class="formatButton" id="cstitleButton"><s>Subtitle</s></button>
+    <button id="saveButton">Save File</button>
+    <button id="modeButton">Swap Modes</button>
+  </div>
+  
+  
+
   <input type="text" id="title" value="{{title}}" />
   <article id="document" contenteditable="true">{{{content}}}</article>
 
