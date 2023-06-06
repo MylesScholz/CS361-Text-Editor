@@ -1,9 +1,18 @@
 <main id="select-file-container">
   <script scr="cookies.mjs" type="module"></script>
   <script src="selectFile.mjs" type="module"></script>
+  <script>
+    function validateForm() {
+      let inputFile = document.forms["openFileForm"]["file"].value
+      if (inputFile == "") {
+        return false
+      }
+    }
+  </script>
 
-  <form id="openFileForm" method="POST" enctype="multipart/form-data">
-    <label id="file-browse-button" for="fileInput">Browse...</label>
+  <form name="openFileForm" id="openFileForm" method="POST" enctype="multipart/form-data"
+    onsubmit="return validateForm()">
+    {{!-- <label id="file-browse-button" for="fileInput">Browse...</label> --}}
     <input type="file" id="fileInput" name="file" accept=".html,.txt" />
     <button type="submit" id="submitButton">Open File</button>
   </form>

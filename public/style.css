@@ -62,11 +62,11 @@ a:hover {
   margin: 0px 10px;
 }
 
-#fileInput {
+/* #fileInput {
   display: none;
-}
+} */
 
-#file-browse-button,
+#fileInput::file-selector-button,
 #submitButton {
   border: 2px solid #82e5b4;
   border-radius: 10px;
@@ -78,7 +78,7 @@ a:hover {
 }
 
 button:hover,
-#file-browse-button:hover,
+#fileInput::file-selector-button:hover,
 #submitButton:hover {
   background-color: #20202e;
 }
