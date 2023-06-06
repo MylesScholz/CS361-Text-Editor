@@ -40,6 +40,13 @@ async function newDocument(userCookieStr, title, content) {
   return await doc.save();
 }
 
+async function readDocument(documentID) {
+  const _id = new mongoose.Types.ObjectId(documentID);
+
+  const query = Document.findOne({ _id });
+  return await query.exec();
+}
+
 async function updateDocument(documentID, title, content) {
   return await Document.findOneAndUpdate(
     { _id: documentID },
@@ -53,6 +60,7 @@ async function updateDocument(documentID, title, content) {
 export const DocumentModel = {
   blurbs: readDocumentBlurbs,
   new: newDocument,
+  read: readDocument,
   update: updateDocument,
 };
 

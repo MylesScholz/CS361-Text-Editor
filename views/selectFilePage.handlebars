@@ -9,4 +9,12 @@
     <input type="file" id="fileInput" name="file" accept=".html,.txt" />
     <button type="submit">Open file</button>
   </form>
+
+  <ul>
+  {{#each documents}}
+  {{#with this}}
+    <li><a href="/loadDocument?doc={{id}}">{{title}}</a></li>
+  {{/with}}
+  {{/each}}
+  </ul>
 </main>
