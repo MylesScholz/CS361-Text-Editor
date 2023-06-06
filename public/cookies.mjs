@@ -1,3 +1,10 @@
+/**
+ * Extracts a cookie from the cookie jar
+ *
+ * @param {string} key the key for the cookie
+ *
+ * @returns the value associated with the key
+ */
 export function extractCookie(key) {
   return document.cookie
     .split("; ")
@@ -5,6 +12,10 @@ export function extractCookie(key) {
     ?.split("=")[1];
 }
 
+/**
+ * Ensures that the user has an id cookie in their cookie jar. If they dont,
+ * it requests one from the server and adds it to the jar.
+ */
 export async function getUserCookie() {
   const userCookie = extractCookie("userCookie");
   if (userCookie === undefined) {

@@ -51,6 +51,7 @@ class Document {
    *  (should be a text input)
    * @param {domElement} docID the dom element that contains the document body
    *  (should be content-editable element)
+   * @param {string} docid the document id of the doc
    */
   constructor(fileName, doc, docid) {
     this.#fileName = fileName;
@@ -88,6 +89,9 @@ class Document {
     downloadFile(this.title, this.htmlText, "text/html", "html");
   }
 
+  /**
+   * Backs up the document to the server, using the associated docid
+   */
   async backup() {
     console.log("backing up document.");
 
@@ -130,6 +134,11 @@ function* modeButtonToggle() {
   }
 }
 
+/**
+ * Launches a subroutine to save the document to the server every 30 seconds.
+ *
+ * @param {Document} document
+ */
 function periodicSave(document) {
   const backupFrequency = 30 * 1000;
 
@@ -149,6 +158,7 @@ function periodicSave(document) {
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Document page JavaScript loaded.");
 
+  // ensures that a user id cookie is loaded
   getUserCookie().catch((e) => console.log("Could not access cookie"));
 
   const docid = document.getElementById("docid").innerText;
@@ -157,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const workingDoc = new Document(title, doc, docid);
 
+  // starts autosaving
   periodicSave(workingDoc);
 
   const saveButton = document.getElementById("save-button");
