@@ -14,14 +14,16 @@ main {
   height: 100%;
 }
 
-/* a {
+a {
   text-decoration: none;
   color: #03a9f4;
+  font-size: 1em;
+  font-family: 'Lato', sans-serif;
 }
 
 a:hover {
   color: #0c719e;
-} */
+}
 
 #title-container {
   display: flex;
