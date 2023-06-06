@@ -147,11 +147,29 @@ document.addEventListener("DOMContentLoaded", function () {
   const stitleButton = document.getElementById("subtitle-button");
   stitleButton.addEventListener("click", (e) => replaceSelectionLines("h3"));
 
+  const unorderedListButton = document.getElementById("unordered-list-button");
+  unorderedListButton.addEventListener("click", (e) => {
+    replaceSelectionLines("li")
+    surroundSelection("ul")
+  });
+
+  const orderedListButton = document.getElementById("ordered-list-button");
+  orderedListButton.addEventListener("click", (e) => {
+    replaceSelectionLines("li")
+    surroundSelection("ol")
+  });
+
   const ctitleButton = document.getElementById("remove-title-button");
   ctitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
   const cstitleButton = document.getElementById("remove-subtitle-button");
   cstitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
+
+  const removeUnorderedListButton = document.getElementById("remove-unordered-list-button");
+  removeUnorderedListButton.addEventListener("click", (e) => removeList("ul"));
+
+  const removeOrderedListButton = document.getElementById("remove-ordered-list-button");
+  removeOrderedListButton.addEventListener("click", (e) => removeList("ol"));
 
   const toggle = modeButtonToggle();
   modeButton.innerText = toggle.next().value;
@@ -393,6 +411,46 @@ function surroundSelection(tag) {
   const range = document.createRange()
   range.selectNodeContents(selectionRange.commonAncestorContainer)
   range.surroundContents(document.createElement(tag))
+
+  selection.collapse(selectionRange.startContainer)
+}
+
+function removeList(listTag) {
+  const selection = document.getSelection();
+  // Note: getRangeAt(0) converts the selection to a Range. There can
+  // technically be multiple ranges in the selection, but very few browsers
+  // support that. In practice, the Range at index 0 is the only Range in the
+  // selection.
+  const selectionRange = selection.getRangeAt(0);
+
+  const closestList = selectionRange.startContainer.parentElement.closest(listTag)
+  const listExtract = document.createDocumentFragment()
+
+  let commonAncestor = selectionRange.commonAncestorContainer
+  if (commonAncestor.nodeType == Node.TEXT_NODE) {
+    commonAncestor = commonAncestor.parentElement
+  }
+  let queue = [commonAncestor]
+  while (queue.length > 0) {
+    let v = queue.shift()
+
+    if (v.nodeType == Node.ELEMENT_NODE && v.matches("li") && selectionRange.intersectsNode(v)) {
+      const range = document.createRange()
+      range.selectNodeContents(v)
+      range.surroundContents(document.createElement("div"))
+      listExtract.appendChild(range.extractContents())
+      v.remove()
+    } else {
+      v.childNodes.forEach((childNode) => {
+        queue.push(childNode)
+      })
+    }
+  }
+  closestList.after(listExtract)
+
+  if (closestList.children.length == 0) {
+    closestList.remove()
+  }
 
   selection.collapse(selectionRange.startContainer)
 }
