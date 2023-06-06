@@ -1,20 +1,18 @@
 <main id="select-file-container">
   <script scr="cookies.mjs" type="module"></script>
   <script src="selectFile.mjs" type="module"></script>
-  <form
-    id="openFileForm"
-    method="POST"
-    enctype="multipart/form-data"
-  >
+
+  <form id="openFileForm" method="POST" enctype="multipart/form-data">
+    <label id="file-browse-button" for="fileInput">Browse...</label>
     <input type="file" id="fileInput" name="file" accept=".html,.txt" />
-    <button type="submit" id="submitButton">Open file</button>
+    <button type="submit" id="submitButton">Open File</button>
   </form>
 
   <ul>
-  {{#each documents}}
-  {{#with this}}
-    <li><a href="/loadDocument?doc={{id}}">{{title}}</a></li>
-  {{/with}}
-  {{/each}}
+    {{#each documents}}
+      {{#with this}}
+        <li><a href="/loadDocument?doc={{id}}">{{title}}</a></li>
+      {{/with}}
+    {{/each}}
   </ul>
 </main>

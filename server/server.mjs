@@ -20,10 +20,10 @@ app.use(express.static("public"));
 /* Insert middleware here */
 
 app.get("/cookie", asyncHandler(async (req, res, next) => {
-    const cookie = await newCookie();
-    console.log(`generated new cookie: ${cookie}`);
-    res.status(200).json(cookie);
-  })
+  const cookie = await newCookie();
+  console.log(`generated new cookie: ${cookie}`);
+  res.status(200).json(cookie);
+})
 );
 
 app.get("/document", asyncHandler(async (req, res, next) => {
@@ -37,20 +37,20 @@ app.get("/document", asyncHandler(async (req, res, next) => {
 }));
 
 app.post(
-    "/document/load", 
-    upload.single("file"), 
-    asyncHandler(async (req, res, next) => {
-  console.log("Opening user document.");
+  "/document/load",
+  upload.single("file"),
+  asyncHandler(async (req, res, next) => {
+    console.log("Opening user document.");
 
-  const file = req.file;
-  const title = path.parse(file.originalname).name;
-  const content = file.buffer.toString();
+    const file = req.file;
+    const title = path.parse(file.originalname).name;
+    const content = file.buffer.toString();
 
-  const doc = await DocumentModel.new(req.query.userid, title, content);
+    const doc = await DocumentModel.new(req.query.userid, title, content);
 
-  const input = { title, content };
-  res.status(200).render("documentPage", input);
-}));
+    const input = { title, content };
+    res.status(200).render("documentPage", input);
+  }));
 
 app.post(
   "/document/backup",

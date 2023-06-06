@@ -1,6 +1,6 @@
 import { extractCookie, getUserCookie } from "/cookies.mjs"
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   console.log("Select file page JavaScript loaded.");
 
   getUserCookie();
