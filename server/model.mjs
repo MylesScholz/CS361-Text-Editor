@@ -12,4 +12,4 @@ const documentSchema = mongoose.Schema({
   content: { type: String, required: true },
 });
 
-const Document = mongoose.model("Document", documentSchema);
+export const Document = mongoose.model("Document", documentSchema);

@@ -2,9 +2,9 @@
   "name": "cs361-text-editor",
   "version": "1.0.0",
   "description": "",
-  "main": "server/server.js",
+  "main": "server/server.mjs",
   "scripts": {
-    "nodemon": "nodemon server/server.js",
+    "nodemon": "nodemon server/server.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

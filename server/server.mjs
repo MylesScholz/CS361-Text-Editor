@@ -1,8 +1,16 @@
-const express = require("express");
-const { engine } = require("express-handlebars");
-const multer = require("multer");
+// const express = require("express");
+// const { engine } = require("express-handlebars");
+// const multer = require("multer");
+// const upload = multer();
+// const path = require("path");
+// const _ = require("./model.js");
+
+import express from "express";
+import { engine } from "express-handlebars";
+import multer from "multer";
+import path from "path";
+
 const upload = multer();
-const path = require("path");
 
 const key =
   "live_PllfhM4oZMM6X1C5s3T2igPjPMBTiKfBEElnckSxHwcxMoGU17lzJFcCmHHyUFWc";
