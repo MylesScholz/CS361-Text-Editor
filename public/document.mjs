@@ -89,6 +89,8 @@ class Document {
   }
 
   async backup() {
+    console.log("backing up document.")
+
     const response = await fetch(`/document/backup?docid=${this.#docid}`, {
       method: "POST",
       headers: {
@@ -128,6 +130,22 @@ function* modeButtonToggle() {
   }
 }
 
+function periodicSave(document) {
+  const backupFrequency = 30 * 1000
+
+  console.log("starting backups.")
+
+  function autobackup(document) {
+    console.log("autobackup...")
+    document.backup();
+    setTimeout(() => {
+      autobackup(document)
+    }, backupFrequency);  
+  }
+
+  setTimeout(() => autobackup(document), backupFrequency)
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Document page JavaScript loaded.");
 
@@ -138,6 +156,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const doc = document.getElementById("document");
 
   const workingDoc = new Document(title, doc, docid);
+
+  periodicSave(workingDoc);
 
   const saveButton = document.getElementById("saveButton");
   saveButton.addEventListener("click", (e) => {
