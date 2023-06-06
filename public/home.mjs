@@ -6,14 +6,19 @@ document.addEventListener("DOMContentLoaded", function () {
   getUserCookie();
 
   const newDocButton = document.getElementById("create-document-button");
-  newDocButton.addEventListener("click", () => {
-    const userCookie = extractCookie("userCookie")
-    location.href = `/document?userid=${userCookie}`
-  })
+  newDocButton.addEventListener("click", async () => {
+    const userCookie = extractCookie("userCookie");
+    const request = await fetch(`/document/new?userid=${userCookie}`, {
+      method: "POST",
+    });
+    const data = await request.json();
+    const docid = data.docid;
+    location.href = `/document?docid=${data.docid}`;
+  });
 
   const openDocButton = document.getElementById("open-document-button");
   openDocButton.addEventListener("click", () => {
     const userCookie = extractCookie("userCookie");
-    location.href = `/selectFile?userid=${userCookie}`
-  })
+    location.href = `/selectFile?userid=${userCookie}`;
+  });
 });

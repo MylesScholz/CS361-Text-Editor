@@ -89,7 +89,7 @@ class Document {
   }
 
   async backup() {
-    console.log("backing up document.")
+    console.log("backing up document.");
 
     const response = await fetch(`/document/backup?docid=${this.#docid}`, {
       method: "POST",
@@ -99,9 +99,9 @@ class Document {
       body: JSON.stringify({
         title: this.title,
         content: this.htmlText,
-      })
-    })
-    console.log(`Backup performed: ${response}`)
+      }),
+    });
+    console.log(`Backup performed: ${response}`);
   }
 
   /**
@@ -131,19 +131,19 @@ function* modeButtonToggle() {
 }
 
 function periodicSave(document) {
-  const backupFrequency = 30 * 1000
+  const backupFrequency = 30 * 1000;
 
-  console.log("starting backups.")
+  console.log("starting backups.");
 
   function autobackup(document) {
-    console.log("autobackup...")
+    console.log("autobackup...");
     document.backup();
     setTimeout(() => {
-      autobackup(document)
+      autobackup(document);
     }, backupFrequency);
   }
 
-  setTimeout(() => autobackup(document), backupFrequency)
+  setTimeout(() => autobackup(document), backupFrequency);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -161,9 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const saveButton = document.getElementById("save-button");
   saveButton.addEventListener("click", (e) => {
-    workingDoc
-      .backup()
-      .catch((e) => console.log(`backup error: ${e}`))
+    workingDoc.backup().catch((e) => console.log(`backup error: ${e}`));
   });
 
   const exportButton = document.getElementById("export-button");
@@ -198,14 +196,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const unorderedListButton = document.getElementById("unordered-list-button");
   unorderedListButton.addEventListener("click", (e) => {
-    replaceSelectionLines("li")
-    surroundSelection("ul")
+    replaceSelectionLines("li");
+    surroundSelection("ul");
   });
 
   const orderedListButton = document.getElementById("ordered-list-button");
   orderedListButton.addEventListener("click", (e) => {
-    replaceSelectionLines("li")
-    surroundSelection("ol")
+    replaceSelectionLines("li");
+    surroundSelection("ol");
   });
 
   const ctitleButton = document.getElementById("remove-title-button");
@@ -214,10 +212,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const cstitleButton = document.getElementById("remove-subtitle-button");
   cstitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
 
-  const removeUnorderedListButton = document.getElementById("remove-unordered-list-button");
+  const removeUnorderedListButton = document.getElementById(
+    "remove-unordered-list-button"
+  );
   removeUnorderedListButton.addEventListener("click", (e) => removeList("ul"));
 
-  const removeOrderedListButton = document.getElementById("remove-ordered-list-button");
+  const removeOrderedListButton = document.getElementById(
+    "remove-ordered-list-button"
+  );
   removeOrderedListButton.addEventListener("click", (e) => removeList("ol"));
 
   const toggle = modeButtonToggle();
@@ -282,8 +284,8 @@ function wrapSelection(tag) {
     endNodeSubrange.surroundContents(endWrapper);
   }
 
-  percolateStyleTags()
-  selection.collapse(selectionRange.startContainer)
+  percolateStyleTags();
+  selection.collapse(selectionRange.startContainer);
 }
 
 /**
@@ -408,8 +410,8 @@ function unwrapSelection(tag) {
     }
   }
 
-  percolateStyleTags()
-  selection.collapse(selectionRange.startContainer)
+  percolateStyleTags();
+  selection.collapse(selectionRange.startContainer);
 }
 
 function replaceSelectionLines(tag) {
@@ -420,33 +422,36 @@ function replaceSelectionLines(tag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  let commonAncestor = selectionRange.commonAncestorContainer
+  let commonAncestor = selectionRange.commonAncestorContainer;
   if (commonAncestor.nodeType == Node.TEXT_NODE) {
-    commonAncestor = commonAncestor.parentElement
+    commonAncestor = commonAncestor.parentElement;
   }
-  let queue = [commonAncestor]
+  let queue = [commonAncestor];
 
   while (queue.length > 0) {
-    let v = queue.shift()
+    let v = queue.shift();
 
-    if (v.nodeType == Node.ELEMENT_NODE && v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")) {
-      const range = document.createRange()
-      range.selectNodeContents(v)
-      range.surroundContents(document.createElement(tag))
-      v.replaceWith(...v.childNodes)
+    if (
+      v.nodeType == Node.ELEMENT_NODE &&
+      v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")
+    ) {
+      const range = document.createRange();
+      range.selectNodeContents(v);
+      range.surroundContents(document.createElement(tag));
+      v.replaceWith(...v.childNodes);
     } else if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
-      const range = document.createRange()
-      range.selectNode(v)
-      range.surroundContents(document.createElement(tag))
+      const range = document.createRange();
+      range.selectNode(v);
+      range.surroundContents(document.createElement(tag));
     } else {
       v.childNodes.forEach((childNode) => {
-        queue.push(childNode)
-      })
+        queue.push(childNode);
+      });
     }
   }
 
-  percolateStyleTags()
-  selection.collapse(selectionRange.startContainer)
+  percolateStyleTags();
+  selection.collapse(selectionRange.startContainer);
 }
 
 function surroundSelection(tag) {
@@ -457,11 +462,11 @@ function surroundSelection(tag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  const range = document.createRange()
-  range.selectNodeContents(selectionRange.commonAncestorContainer)
-  range.surroundContents(document.createElement(tag))
+  const range = document.createRange();
+  range.selectNodeContents(selectionRange.commonAncestorContainer);
+  range.surroundContents(document.createElement(tag));
 
-  selection.collapse(selectionRange.startContainer)
+  selection.collapse(selectionRange.startContainer);
 }
 
 function removeList(listTag) {
@@ -472,34 +477,39 @@ function removeList(listTag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  const closestList = selectionRange.startContainer.parentElement.closest(listTag)
-  const listExtract = document.createDocumentFragment()
+  const closestList =
+    selectionRange.startContainer.parentElement.closest(listTag);
+  const listExtract = document.createDocumentFragment();
 
-  let commonAncestor = selectionRange.commonAncestorContainer
+  let commonAncestor = selectionRange.commonAncestorContainer;
   if (commonAncestor.nodeType == Node.TEXT_NODE) {
-    commonAncestor = commonAncestor.parentElement
+    commonAncestor = commonAncestor.parentElement;
   }
-  let queue = [commonAncestor]
+  let queue = [commonAncestor];
   while (queue.length > 0) {
-    let v = queue.shift()
+    let v = queue.shift();
 
-    if (v.nodeType == Node.ELEMENT_NODE && v.matches("li") && selectionRange.intersectsNode(v)) {
-      const range = document.createRange()
-      range.selectNodeContents(v)
-      range.surroundContents(document.createElement("div"))
-      listExtract.appendChild(range.extractContents())
-      v.remove()
+    if (
+      v.nodeType == Node.ELEMENT_NODE &&
+      v.matches("li") &&
+      selectionRange.intersectsNode(v)
+    ) {
+      const range = document.createRange();
+      range.selectNodeContents(v);
+      range.surroundContents(document.createElement("div"));
+      listExtract.appendChild(range.extractContents());
+      v.remove();
     } else {
       v.childNodes.forEach((childNode) => {
-        queue.push(childNode)
-      })
+        queue.push(childNode);
+      });
     }
   }
-  closestList.after(listExtract)
+  closestList.after(listExtract);
 
   if (closestList.children.length == 0) {
-    closestList.remove()
+    closestList.remove();
   }
 
-  selection.collapse(selectionRange.startContainer)
+  selection.collapse(selectionRange.startContainer);
 }

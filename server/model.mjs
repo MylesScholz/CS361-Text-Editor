@@ -19,42 +19,67 @@ const documentSchema = mongoose.Schema({
 const UserCookie = mongoose.model("userCookie", userCookieSchema);
 const Document = mongoose.model("Document", documentSchema);
 
+export const CookieError = { Error: "Could not generate cookie" };
+export const ReadError = { Error: "Could not read database" };
+export const WriteError = { Error: "Could not write database" };
+export const UpdateError = { Error: "Could not update database" };
+
 export async function newCookie() {
-  const cookie = new UserCookie();
-  return await cookie.save();
+  try {
+    const cookie = new UserCookie();
+    return await cookie.save();
+  } catch (error) {
+    throw CookieError;
+  }
 }
 
 async function readDocumentBlurbs(userCookie) {
-  const query = Document.find({ userCookie }, "title _id");
-  return await query.exec();
+  try {
+    const query = Document.find({ userCookie }, "title _id");
+    return await query.exec();
+  } catch (error) {
+    throw ReadError;
+  }
 }
 
 async function newDocument(userCookieStr, title, content) {
-  const userCookie = new mongoose.Types.ObjectId(userCookieStr);
+  try {
+    const userCookie = new mongoose.Types.ObjectId(userCookieStr);
 
-  const doc = new Document({
-    userCookie,
-    title,
-    content,
-  });
-  return await doc.save();
+    const doc = new Document({
+      userCookie,
+      title,
+      content,
+    });
+    return await doc.save();
+  } catch (error) {
+    throw WriteError;
+  }
 }
 
 async function readDocument(documentID) {
-  const _id = new mongoose.Types.ObjectId(documentID);
+  try {
+    const _id = new mongoose.Types.ObjectId(documentID);
 
-  const query = Document.findOne({ _id });
-  return await query.exec();
+    const query = Document.findOne({ _id });
+    return await query.exec();
+  } catch (error) {
+    throw ReadError;
+  }
 }
 
 async function updateDocument(documentID, title, content) {
-  return await Document.findOneAndUpdate(
-    { _id: documentID },
-    { title, content },
-    {
-      new: true,
-    }
-  );
+  try {
+    return await Document.findOneAndUpdate(
+      { _id: documentID },
+      { title, content },
+      {
+        new: true,
+      }
+    );
+  } catch (error) {
+    throw UpdateError;
+  }
 }
 
 export const DocumentModel = {
@@ -63,4 +88,3 @@ export const DocumentModel = {
   read: readDocument,
   update: updateDocument,
 };
-
