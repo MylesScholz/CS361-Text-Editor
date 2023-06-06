@@ -42,6 +42,7 @@ class Document {
   #fileName; // the DOM element that holds the file name
   #doc; // the document DOM element
   #mode; // Whether the document is in WYSIWYG mode, or markup (html) mode
+  #docid; // the document ID
 
   /**
    * Creates a document from the dom IDs of its title and body
@@ -51,10 +52,11 @@ class Document {
    * @param {domElement} docID the dom element that contains the document body
    *  (should be content-editable element)
    */
-  constructor(fileName, doc) {
+  constructor(fileName, doc, docid) {
     this.#fileName = fileName;
     this.#doc = doc;
     this.#mode = Document.WYSIWYG;
+    this.#docid = docid;
   }
 
   /**
@@ -84,6 +86,20 @@ class Document {
    */
   download() {
     downloadFile(this.title, this.htmlText, "text/html", "html");
+  }
+
+  async backup() {
+    const response = await fetch(`/document/backup?docid=${this.#docid}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: this.title,
+        content: this.htmlText,
+      })
+    })
+    console.log(`Backup performed: ${response}`)
   }
 
   /**
@@ -117,13 +133,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   getUserCookie().catch((e) => console.log("Could not access cookie"));
 
+  const docid = document.getElementById("docid").innerText;
   const title = document.getElementById("title");
   const doc = document.getElementById("document");
 
-  const workingDoc = new Document(title, doc);
+  const workingDoc = new Document(title, doc, docid);
 
   const saveButton = document.getElementById("saveButton");
-  saveButton.addEventListener("click", (e) => workingDoc.download(e));
+  saveButton.addEventListener("click", (e) => {
+    workingDoc
+     .backup()
+     .catch((e) => console.log(`backup error: ${e}`))
+  });
+
+  const exportButton = document.getElementById("exportButton");
+  exportButton.addEventListener("click", (e) => workingDoc.download(e));
 
   const modeButton = document.getElementById("modeButton");
   modeButton.addEventListener("click", (e) => workingDoc.swapModes(e));

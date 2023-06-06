@@ -13,7 +13,7 @@ const app = express();
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-app.set(express.json());
+app.use(express.json());
 
 app.use(express.static("public"));
 
@@ -33,19 +33,37 @@ app.get("/document", asyncHandler(async (req, res, next) => {
   const content = ""
 
   const doc = await DocumentModel.new(req.query.userid, title, content);
-  res.status(200).render("documentPage", { title, content, });
+  res.status(200).render("documentPage", { docid: doc._id, title, content, });
 }));
 
-app.post("/document", upload.single("file"), (req, res, next) => {
+app.post(
+    "/document/load", 
+    upload.single("file"), 
+    asyncHandler(async (req, res, next) => {
   console.log("Opening user document.");
 
   const file = req.file;
   const title = path.parse(file.originalname).name;
   const content = file.buffer.toString();
 
+  const doc = await DocumentModel.new(req.query.userid, title, content);
+
   const input = { title, content };
   res.status(200).render("documentPage", input);
-});
+}));
+
+app.post(
+  "/document/backup",
+  asyncHandler(async (req, res, next) => {
+    const docid = req.query.docid;
+    const title = req.body.title;
+    const content = req.body.content;
+
+    console.log(`backing up user document "${req.query.docid}"`)
+
+    await DocumentModel.update(docid, title, content);
+  })
+)
 
 app.get("/selectFile", asyncHandler(async (req, res, next) => {
   console.log("Opening selectFile page.");
@@ -59,9 +77,9 @@ app.get("/loadDocument", asyncHandler(async (req, res, next) => {
   console.log("Loading existing document.");
 
   const data = await DocumentModel.read(req.query.doc);
-  console.log(data)
 
   res.status(200).render("documentPage", {
+    docid: data._id,
     title: data.title,
     content: data.content,
   })
