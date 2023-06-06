@@ -1,5 +1,6 @@
 <main id="document-container">
-  <script src="document.js" type="text/javascript" defer></script>
+  <script type="module" src="cookies.mjs"></script>
+  <script type="module" src="document.mjs" defer></script>
 
   <div id="ribbon">
     <button class="formatButton" id="boldButton"><strong>B</strong></button>
@@ -18,8 +19,4 @@
 
   <input type="text" id="title" value="{{title}}" />
   <article id="document" contenteditable="true">{{{content}}}</article>
-
-  {{#if important}}
-    <img src="{{src}}" width="{{width}}" height="{{height}}" />
-  {{/if}}
 </main>

@@ -1,19 +1,11 @@
-// const express = require("express");
-// const { engine } = require("express-handlebars");
-// const multer = require("multer");
-// const upload = multer();
-// const path = require("path");
-// const _ = require("./model.js");
-
 import express from "express";
 import { engine } from "express-handlebars";
 import multer from "multer";
 import path from "path";
+import asyncHandler from "express-async-handler";
+import { newCookie, DocumentModel } from "./model.mjs";
 
 const upload = multer();
-
-const key =
-  "live_PllfhM4oZMM6X1C5s3T2igPjPMBTiKfBEElnckSxHwcxMoGU17lzJFcCmHHyUFWc";
 
 const port = process.env.port || 3000;
 const app = express();
@@ -27,13 +19,22 @@ app.use(express.static("public"));
 
 /* Insert middleware here */
 
-app.get("/document", (req, res, next) => {
+app.get("/cookie", asyncHandler(async (req, res, next) => {
+    const cookie = await newCookie();
+    console.log(`generated new cookie: ${cookie}`);
+    res.status(200).json(cookie);
+  })
+);
+
+app.get("/document", asyncHandler(async (req, res, next) => {
   console.log("Opening document page.");
-  res.status(200).render("documentPage", {
-    title: "Untitled",
-    content: "",
-  });
-});
+
+  const title = "Untitled"
+  const content = ""
+
+  const doc = await DocumentModel.new(req.query.id, title, content);
+  res.status(200).render("documentPage", { title, content, });
+}));
 
 app.post("/document", upload.single("file"), (req, res, next) => {
   console.log("Opening user document.");
@@ -43,30 +44,7 @@ app.post("/document", upload.single("file"), (req, res, next) => {
   const content = file.buffer.toString();
 
   const input = { title, content };
-
-  // very important, vital functionality
-  if (title == "give me a kitty") {
-    console.log("cat zone");
-
-    fetch("https://api.thecatapi.com/v1/images/search", {
-      headers: {
-        "x-api-key": key,
-      },
-    })
-      .then((value) => value.json())
-      .then(([data]) => {
-        res.status(200).render("documentPage", {
-          important: true,
-          src: data.url,
-          width: data.width,
-          height: data.height,
-          ...input,
-        });
-      })
-      .catch((err) => res.status(200).render("documentPage", input));
-  } else {
-    res.status(200).render("documentPage", input);
-  }
+  res.status(200).render("documentPage", input);
 });
 
 app.get("/selectFile", (req, res, next) => {

@@ -1,10 +1,8 @@
 <main id="home-page-container">
-  <script src="home.js" type="text/javascript" defer></script>
+  <script type="module" src="cookies.mjs"></script>
+  <script type="module" src="home.mjs" defer></script>
 
-  <button
-    id="create-document-button"
-    onclick="location.href = '/document'"
-  >Create a New Document</button>
+  <button id="create-document-button">Create a New Document</buttonid>
 
   <button id="open-document-button" onclick="location.href = '/selectFile'">Open
     an Existing Document</button>

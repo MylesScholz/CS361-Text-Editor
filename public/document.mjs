@@ -1,4 +1,5 @@
-console.log("Document page JavaScript loaded.");
+import { getUserCookie } from "/cookies.mjs";
+
 // List of style tags in the order in which they will be nested from outermost
 // to innermost
 const styleTags = ["b", "em", "u"];
@@ -112,6 +113,10 @@ function* modeButtonToggle() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  console.log("Document page JavaScript loaded.");
+
+  getUserCookie().catch((e) => console.log("Could not access cookie"));
+
   const title = document.getElementById("title");
   const doc = document.getElementById("document");
 

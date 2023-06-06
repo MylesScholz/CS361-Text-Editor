@@ -13,7 +13,7 @@ const userCookieSchema = mongoose.Schema({});
 const documentSchema = mongoose.Schema({
   userCookie: { type: mongoose.ObjectId, required: true },
   title: { type: String, required: true },
-  content: { type: String, required: true },
+  content: { type: String, default: "" },
 });
 
 const UserCookie = mongoose.model("userCookie", userCookieSchema);
@@ -29,7 +29,9 @@ async function readDocumentBlurbs(userCookie) {
   return await query.exec();
 }
 
-async function newDocument(userCookie, title, content) {
+async function newDocument(userCookieStr, title, content) {
+  const userCookie = new mongoose.Types.ObjectId(userCookieStr);
+
   const doc = new Document({
     userCookie,
     title,
@@ -54,20 +56,3 @@ export const DocumentModel = {
   update: updateDocument,
 };
 
-/*
-async function test() {
-  const cookie = await newCookie();
-  console.log(`created: ${cookie}`);
-
-  const doc = await newDocument(cookie, "untitled", "asdfasdf");
-  console.log(`created: ${doc}`);
-
-  const blurbs = await readDocumentBlurbs(cookie);
-  console.log(`blurbs: ${blurbs}`);
-
-  const update = await updateDocument(cookie, "titled", ";lkj;lkj");
-  console.log(`updated doc: ${update}`);
-}
-
-test().catch((e) => console.log(e));
-*/
