@@ -1,18 +1,22 @@
 <main id="select-file-container">
   <script scr="cookies.mjs" type="module"></script>
   <script src="selectFile.mjs" type="module"></script>
+  {{! the weird // --... are to stop my linter from going crazy. }}
   <script>
-    function validateForm() {
-      let inputFile = document.forms["openFileForm"]["file"].value
-      if (inputFile == "") {
-        return false
-      }
-    }
+    function validateForm() { let inputFile =
+    document.forms["openFileForm"]["file"].value; // --------------------------
+    // ------------------------------------------------------------------------
+    if (inputFile == "") { return false; } }
   </script>
 
-  <form name="openFileForm" id="openFileForm" method="POST" enctype="multipart/form-data"
-    onsubmit="return validateForm()">
-    {{!-- <label id="file-browse-button" for="fileInput">Browse...</label> --}}
+  <form
+    name="openFileForm"
+    id="openFileForm"
+    method="POST"
+    enctype="multipart/form-data"
+    onsubmit="return validateForm()"
+  >
+    {{! <label id="file-browse-button" for="fileInput">Browse...</label> }}
     <input type="file" id="fileInput" name="file" accept=".html,.txt" />
     <button type="submit" id="submitButton">Open File</button>
   </form>
@@ -20,7 +24,7 @@
   <ul>
     {{#each documents}}
       {{#with this}}
-        <li><a href="/loadDocument?doc={{id}}">{{title}}</a></li>
+        <li><a href="/document?docid={{id}}">{{title}}</a></li>
       {{/with}}
     {{/each}}
   </ul>

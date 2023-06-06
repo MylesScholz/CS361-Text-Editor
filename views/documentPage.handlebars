@@ -12,9 +12,12 @@
           <button class="format-button" id="underline-button"><u>U</u></button>
         </div>
         <div id="remove-style-format-button-container">
-          <button class="format-button" id="remove-bold-button"><s>B</s></button>
-          <button class="format-button" id="remove-italic-button"><s>I</s></button>
-          <button class="format-button" id="remove-underline-button"><s>U</s></button>
+          <button class="format-button" id="remove-bold-button"><s
+            >B</s></button>
+          <button class="format-button" id="remove-italic-button"><s
+            >I</s></button>
+          <button class="format-button" id="remove-underline-button"><s
+            >U</s></button>
         </div>
       </div>
       <div id="structure-format-button-container">
@@ -25,10 +28,14 @@
           <button class="format-button" id="ordered-list-button">Numbered List</button>
         </div>
         <div id="remove-structure-format-button-container">
-          <button class="format-button" id="remove-title-button"><s>Title</s></button>
-          <button class="format-button" id="remove-subtitle-button"><s>Subtitle</s></button>
-          <button class="format-button" id="remove-unordered-list-button"><s>Bulleted List</s></button>
-          <button class="format-button" id="remove-ordered-list-button"><s>Numbered List</s></button>
+          <button class="format-button" id="remove-title-button"><s
+            >Title</s></button>
+          <button class="format-button" id="remove-subtitle-button"><s
+            >Subtitle</s></button>
+          <button class="format-button" id="remove-unordered-list-button"><s
+            >Bulleted List</s></button>
+          <button class="format-button" id="remove-ordered-list-button"><s
+            >Numbered List</s></button>
         </div>
       </div>
     </div>
@@ -41,8 +48,4 @@
 
   <input type="text" id="title" value="{{title}}" />
   <article id="document" contenteditable="true">{{{content}}}</article>
-
-  {{#if important}}
-    <img src="{{src}}" width="{{width}}" height="{{height}}" />
-  {{/if}}
 </main>
