@@ -206,16 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
   stitleButton.addEventListener("click", (e) => replaceSelectionLines("h3"));
 
   const unorderedListButton = document.getElementById("unordered-list-button");
-  unorderedListButton.addEventListener("click", (e) => {
-    replaceSelectionLines("li");
-    surroundSelection("ul");
-  });
+  unorderedListButton.addEventListener("click", (e) => listSelection("ul"));
 
   const orderedListButton = document.getElementById("ordered-list-button");
-  orderedListButton.addEventListener("click", (e) => {
-    replaceSelectionLines("li");
-    surroundSelection("ol");
-  });
+  orderedListButton.addEventListener("click", (e) => listSelection("ol"));
 
   const ctitleButton = document.getElementById("remove-title-button");
   ctitleButton.addEventListener("click", (e) => replaceSelectionLines("div"));
@@ -226,12 +220,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const removeUnorderedListButton = document.getElementById(
     "remove-unordered-list-button"
   );
-  removeUnorderedListButton.addEventListener("click", (e) => removeList("ul"));
+  removeUnorderedListButton.addEventListener("click", (e) => removeList());
 
   const removeOrderedListButton = document.getElementById(
     "remove-ordered-list-button"
   );
-  removeOrderedListButton.addEventListener("click", (e) => removeList("ol"));
+  removeOrderedListButton.addEventListener("click", (e) => removeList());
 
   const toggle = modeButtonToggle();
   modeButton.innerText = toggle.next().value;
@@ -437,20 +431,21 @@ function replaceSelectionLines(tag) {
   if (commonAncestor.nodeType == Node.TEXT_NODE) {
     commonAncestor = commonAncestor.parentElement;
   }
-  let queue = [commonAncestor];
 
+  let queue = [commonAncestor];
   while (queue.length > 0) {
     let v = queue.shift();
 
     if (
       v.nodeType == Node.ELEMENT_NODE &&
-      v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")
+      v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li") &&
+      selectionRange.intersectsNode(v)
     ) {
       const range = document.createRange();
       range.selectNodeContents(v);
       range.surroundContents(document.createElement(tag));
       v.replaceWith(...v.childNodes);
-    } else if (v.nodeType == Node.TEXT_NODE && v.textContent != "") {
+    } else if (v.nodeType == Node.TEXT_NODE && v.textContent != "" && selectionRange.intersectsNode(v)) {
       const range = document.createRange();
       range.selectNode(v);
       range.surroundContents(document.createElement(tag));
@@ -465,7 +460,7 @@ function replaceSelectionLines(tag) {
   selection.collapse(selectionRange.startContainer);
 }
 
-function surroundSelection(tag) {
+function listSelection(listTag) {
   const selection = document.getSelection();
   // Note: getRangeAt(0) converts the selection to a Range. There can
   // technically be multiple ranges in the selection, but very few browsers
@@ -473,14 +468,49 @@ function surroundSelection(tag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  const range = document.createRange();
-  range.selectNodeContents(selectionRange.commonAncestorContainer);
-  range.surroundContents(document.createElement(tag));
+  let closestLineElementToStart = selectionRange.startContainer.parentElement.closest("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li")
+  let previousSibling = closestLineElementToStart.previousElementSibling
 
+  let commonAncestor = selectionRange.commonAncestorContainer;
+  if (commonAncestor.nodeType == Node.TEXT_NODE) {
+    commonAncestor = commonAncestor.parentElement;
+  }
+
+  let listDoc = document.createDocumentFragment();
+  listDoc.append(document.createElement(listTag));
+
+  let queue = [commonAncestor];
+  while (queue.length > 0) {
+    let v = queue.shift();
+
+    if (
+      v.nodeType == Node.ELEMENT_NODE &&
+      v.matches("div, h1, h2, h3, h4, h5, h6, p, ul, ol, li") &&
+      selectionRange.intersectsNode(v)
+    ) {
+      const range = document.createRange();
+      range.selectNodeContents(v);
+      range.surroundContents(document.createElement("li"));
+      listDoc.firstElementChild.append(range.extractContents());
+      v.remove();
+    } else {
+      v.childNodes.forEach((childNode) => {
+        queue.push(childNode);
+      });
+    }
+  }
+
+  if (previousSibling != null) {
+    previousSibling.after(listDoc)
+  } else {
+    commonAncestor.prepend(listDoc)
+  }
+
+  percolateStyleTags();
   selection.collapse(selectionRange.startContainer);
 }
 
-function removeList(listTag) {
+function removeList() {
   const selection = document.getSelection();
   // Note: getRangeAt(0) converts the selection to a Range. There can
   // technically be multiple ranges in the selection, but very few browsers
@@ -488,8 +518,8 @@ function removeList(listTag) {
   // selection.
   const selectionRange = selection.getRangeAt(0);
 
-  const closestList =
-    selectionRange.startContainer.parentElement.closest(listTag);
+  let closestList =
+    selectionRange.startContainer.parentElement.closest("ol, ul");
   const listExtract = document.createDocumentFragment();
 
   let commonAncestor = selectionRange.commonAncestorContainer;
@@ -516,11 +546,17 @@ function removeList(listTag) {
       });
     }
   }
-  closestList.after(listExtract);
 
-  if (closestList.children.length == 0) {
-    closestList.remove();
+  if (closestList != null) {
+    closestList.after(listExtract);
+
+    if (closestList.children.length == 0) {
+      closestList.remove();
+    }
+  } else {
+    commonAncestor.append(listExtract)
   }
 
+  percolateStyleTags();
   selection.collapse(selectionRange.startContainer);
 }
